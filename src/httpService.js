@@ -25,6 +25,7 @@ export default {
                           return {
                               src: item.url,
                               type: item.contentType,
+                              label: item.height,
                           }
                       })
               }

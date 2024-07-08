@@ -1,26 +1,17 @@
 <template>
   <div class="video-player-wrap">
-    <video-player v-if="!loading"
-        :sources="sources"
-        :poster="cover"
-        :responsive="false"
-        :fluid="true"
-        :plugins="plugins"
-        controls
-        :loop="false"
-        :volume="0.6"
-    />
+    <video ref="player" v-if="!loading" class="video-js"></video>
   </div>
 </template>
 
 <script>
-import qualityLevels from "videojs-contrib-quality-levels"
-import hlsQualitySelector from "jb-videojs-hls-quality-selector"
-import { defineComponent } from 'vue'
-import { VideoPlayer } from '@videojs-player/vue'
+import videojs from 'video.js'
 import 'video.js/dist/video-js.css'
+import qualitySelector from "@silvermine/videojs-quality-selector"
+import "@silvermine/videojs-quality-selector/dist/css/quality-selector.css"
+import { defineComponent } from 'vue'
 import httpService from "./httpService";
-
+qualitySelector(videojs);
 
 export default defineComponent({
   name: "WistiaPlayer",
@@ -34,10 +25,24 @@ export default defineComponent({
   },
 
   computed: {
-    plugins() {
+    options() {
       return {
-        qualityLevels: qualityLevels,
-        hlsQualitySelector: hlsQualitySelector,
+        controlBar: {
+          children: [
+            'playToggle',
+            'progressControl',
+            'volumePanel',
+            'qualitySelector',
+            'fullscreenToggle',
+          ],
+        },
+        sources: this.sources,
+        loop: false,
+        fluid: true,
+        preload: true,
+        playsinline: true,
+        controls: true,
+        poster: this.cover
       }
     },
   },
@@ -49,12 +54,13 @@ export default defineComponent({
     },
   },
 
-  components: {
-    VideoPlayer,
-  },
-
   mounted() {
-    this.fetchAssets(this.id);
+    this.fetchAssets(this.id)
+      .then(() => {
+        this.$nextTick(() => {
+          videojs(this.$refs.player, this.options);
+        })
+      });
   },
 
   methods: {
@@ -63,7 +69,13 @@ export default defineComponent({
       return httpService.fetchAssets(hashId)
           .then(res => {
             this.cover = res.cover;
-            this.sources = res.sources;
+            this.sources = Array.from(res.sources)
+              .map((row) => {
+                if (row.label > 640 && row.label < 1080) {
+                  row.selected = true;
+                }
+                return row;
+              })
           })
           .finally(() => {
             this.loading = false;
