@@ -30,9 +30,16 @@ export default defineComponent({
         controlBar: {
           children: [
             'playToggle',
+            'currentTimeDisplay', 
+            'durationDisplay',
             'progressControl',
-            'volumePanel',
+            {
+              name: 'volumePanel',
+              inline: false,
+              vertical: true
+            },
             'qualitySelector',
+            'playbackRateMenuButton',
             'fullscreenToggle',
           ],
         },
@@ -42,7 +49,8 @@ export default defineComponent({
         preload: true,
         playsinline: true,
         controls: true,
-        poster: this.cover
+        poster: this.cover,
+        playbackRates: [2, 1.75, 1.5, 1.25, 1, 0.75, 0.5],
       }
     },
   },
@@ -84,3 +92,63 @@ export default defineComponent({
   }
 });
 </script>
+
+<style lang="scss">
+  .video-player-wrap {
+    position: relative;
+    
+    .video-js .vjs-big-play-button {
+      border-radius: 0;
+      border: none;
+      background-color: rgba(84, 187, 255, 0.7);
+      &:hover{
+        background-color: rgba(161, 217, 255, 0.7);
+      }
+    }
+
+    .video-js .vjs-control-bar {
+      display: flex;
+      visibility: visible;
+      opacity: 1;
+      transition: visibility 0.1s, opacity 0.1s;
+      background-color: rgba(84, 187, 255, 0.7);
+    }
+
+    .video-js .vjs-duration {
+      display: block;
+    }
+
+    .vjs-has-started.video-js {
+
+      .vjs-duration {
+        display: none;
+      }
+
+      .vjs-current-time{
+        display: block;
+      }
+    } 
+
+    .video-js .vjs-play-progress {
+      background-color: #fff;
+    }
+
+    .video-js .vjs-slider,
+    .video-js .vjs-load-progress div {
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .video-js .vjs-play-control.vjs-ended .vjs-icon-placeholder:before {
+      content: "\f101";
+    }
+
+    .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+      width: 6em;
+      max-height: none
+    }
+
+    .vjs-menu-button-popup .vjs-menu {
+      left: -1em;
+    }
+  }
+</style>
