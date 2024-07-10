@@ -11,6 +11,7 @@ import qualitySelector from "@silvermine/videojs-quality-selector"
 import "@silvermine/videojs-quality-selector/dist/css/quality-selector.css"
 import { defineComponent } from 'vue'
 import httpService from "./httpService";
+import trackingService from "./trackingService";
 qualitySelector(videojs);
 
 export default defineComponent({
@@ -18,6 +19,7 @@ export default defineComponent({
 
   data() {
     return {
+      watcher: null,
       loading: true,
       cover: "",
       sources: [],
@@ -30,7 +32,7 @@ export default defineComponent({
         controlBar: {
           children: [
             'playToggle',
-            'currentTimeDisplay', 
+            'currentTimeDisplay',
             'durationDisplay',
             'progressControl',
             {
@@ -66,9 +68,20 @@ export default defineComponent({
     this.fetchAssets(this.id)
       .then(() => {
         this.$nextTick(() => {
-          videojs(this.$refs.player, this.options);
+          const player = videojs(this.$refs.player, this.options, () => {
+            this.watcher = trackingService(player);
+            const shadowPlayer = this.watcher.onReady();
+            window.dispatchEvent(new CustomEvent("video-player-ready", {detail: shadowPlayer}));
+            this.watcher.start();
+          });
         })
       });
+  },
+
+  beforeUnmount() {
+    if (this.watcher) {
+      this.watcher.stop();
+    }
   },
 
   methods: {
@@ -102,8 +115,8 @@ export default defineComponent({
         background-color: rgba(84, 187, 255, 0.7);
       }
     }
-    
-    
+
+
     .video-js .vjs-big-play-button {
       width: 2.5em;
       font-size: 5.6em;
@@ -120,7 +133,7 @@ export default defineComponent({
         display: block;
         width: 100%;
         height: 100%;
-        
+
         &:before {
           width: auto;
           height: auto;
@@ -154,7 +167,7 @@ export default defineComponent({
       .vjs-current-time{
         display: block;
       }
-    } 
+    }
 
     .video-js .vjs-play-progress {
       background-color: #fff;
