@@ -96,22 +96,49 @@ export default defineComponent({
 <style lang="scss">
   .video-player-wrap {
     position: relative;
+
+    .video-js:hover {
+      .vjs-big-play-button {
+        background-color: rgba(84, 187, 255, 0.7);
+      }
+    }
+    
     
     .video-js .vjs-big-play-button {
+      width: 2.5em;
+      font-size: 5.6em;
       border-radius: 0;
       border: none;
+      margin: 0;
+      transform: translate(-50%, -50%);
       background-color: rgba(84, 187, 255, 0.7);
       &:hover{
         background-color: rgba(161, 217, 255, 0.7);
+      }
+
+      .vjs-icon-placeholder {
+        display: block;
+        width: 100%;
+        height: 100%;
+        
+        &:before {
+          width: auto;
+          height: auto;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+        }
       }
     }
 
     .video-js .vjs-control-bar {
       display: flex;
+      height: 4.4em;
       visibility: visible;
       opacity: 1;
       transition: visibility 0.1s, opacity 0.1s;
       background-color: rgba(84, 187, 255, 0.7);
+      vertical-align: middle;
     }
 
     .video-js .vjs-duration {
@@ -142,13 +169,58 @@ export default defineComponent({
       content: "\f101";
     }
 
-    .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
-      width: 6em;
-      max-height: none
+    .vjs-menu-button-popup .vjs-menu {
+      bottom: 0;
+      right: 0;
+      left: 0;
+      margin-bottom: 4.4em;
     }
 
-    .vjs-menu-button-popup .vjs-menu {
-      left: -1em;
+    .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
+      width: 13.6em;
+      bottom: 0;
+      left: -5.1em;
+      max-height: none;
+    }
+
+    .vjs-quality-selector .vjs-menu .vjs-menu-content {
+      left: -1.1em;
+    }
+
+    .vjs-playback-rate.vjs-control{
+      width: 4.5em;
+    }
+
+    .vjs-quality-selector .vjs-menu,
+    .vjs-playback-rate .vjs-menu{
+      display: none;
+      &:hover{
+        display: block;
+      }
+    }
+
+    .vjs-menu li.vjs-menu-item{
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+      }
+    }
+
+    .vjs-button > .vjs-icon-placeholder:before {
+      font-size: 2.8em;
+      line-height: 1.67;
+    }
+
+    .vjs-duration-display,
+    .video-js .vjs-playback-rate-value,
+    .vjs-current-time-display {
+      font-size: 2em;
+      line-height: 2.4em;
+    }
+
+    .vjs-menu-item {
+      font-size: 1.6em;
+      line-height: 1.8em;
     }
   }
 </style>

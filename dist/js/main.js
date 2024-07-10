@@ -80,7 +80,7 @@ var update = add("0ebb6dd7", content, true, {});
 
 /***/ }),
 
-/***/ 874:
+/***/ 303:
 /***/ (function(__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -89,7 +89,7 @@ var update = add("0ebb6dd7", content, true, {});
 var runtime_dom_esm_bundler = __webpack_require__(751);
 // EXTERNAL MODULE: ./node_modules/@vue/runtime-core/dist/runtime-core.esm-bundler.js
 var runtime_core_esm_bundler = __webpack_require__(641);
-;// CONCATENATED MODULE: ./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./src/WistiaPlayer.vue?vue&type=template&id=93b24f46
+;// CONCATENATED MODULE: ./node_modules/vue-loader/dist/templateLoader.js??ruleSet[1].rules[2]!./node_modules/vue-loader/dist/index.js??ruleSet[0].use[0]!./src/WistiaPlayer.vue?vue&type=template&id=35f78b30
 
 
 const _hoisted_1 = { class: "video-player-wrap" }
@@ -106,7 +106,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       : (0,runtime_core_esm_bundler/* createCommentVNode */.Q3)("", true)
   ]))
 }
-;// CONCATENATED MODULE: ./src/WistiaPlayer.vue?vue&type=template&id=93b24f46
+;// CONCATENATED MODULE: ./src/WistiaPlayer.vue?vue&type=template&id=35f78b30
 
 // EXTERNAL MODULE: ./node_modules/video.js/dist/video.es.js + 18 modules
 var video_es = __webpack_require__(174);
@@ -465,7 +465,7 @@ module.exports = "data:application/font-woff;charset=utf-8;base64,d09GRgABAAAAAB
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
 /******/ 	// This entry module depends on other loaded chunks and execution need to be delayed
-/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, [121], function() { return __webpack_require__(874); })
+/******/ 	var __webpack_exports__ = __webpack_require__.O(undefined, [121], function() { return __webpack_require__(303); })
 /******/ 	__webpack_exports__ = __webpack_require__.O(__webpack_exports__);
 /******/ 	
 /******/ })()
