@@ -84,6 +84,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
 const FontminPlugin = require('./src/webpack/fontmin-webpack.js');
+const TerserWebpackPlugin = require('terser-webpack-plugin');
 
 /*
  * We've enabled HtmlWebpackPlugin for you! This generates a html
@@ -138,13 +139,13 @@ const config = {
 	plugins: [
 		new webpack.ProgressPlugin(),
 
-		new MiniCssExtractPlugin({
-			// Options similar to the same options in webpackOptions.output
-			// all options are optional
-			filename: 'css/[name].css',
-			// chunkFilename: 'css/[id].css',
-			ignoreOrder: false, // Enable to remove warnings about conflicting order
-		}),
+		// new MiniCssExtractPlugin({
+		// 	// Options similar to the same options in webpackOptions.output
+		// 	// all options are optional
+		// 	filename: 'css/[name].css',
+		// 	// chunkFilename: 'css/[id].css',
+		// 	ignoreOrder: false, // Enable to remove warnings about conflicting order
+		// }),
 
 		new VueLoaderPlugin(),
 
@@ -211,14 +212,15 @@ const config = {
 			{
 				test: /\.s[ac]ss$/i,
 				use: [
-					{
-						loader: MiniCssExtractPlugin.loader,
-						options: {
-							// you can specify a publicPath here
-							// by default it uses publicPath in webpackOptions.output
-							publicPath: "../",
-						},
-					},
+					// {
+					// 	loader: MiniCssExtractPlugin.loader,
+					// 	options: {
+					// 		// you can specify a publicPath here
+					// 		// by default it uses publicPath in webpackOptions.output
+					// 		publicPath: "../",
+					// 	},
+					// },
+					'style-loader',
 					{
 						loader: 'css-loader',
 						options: {
@@ -288,42 +290,6 @@ const config = {
 	},
 
 	optimization: {
-		splitChunks: {
-			automaticNameDelimiter: '-',
-			hidePathInfo: true,
-			cacheGroups: {
-				vendors: {
-					name: "vendor",
-					chunks: 'initial',
-					test: (module, chunk) => {
-						const npmRule = /(node_modules)/i,
-							cssRule = /\.(css|s[ac]ss)$/i,
-							resourcePath = module.resource;
-
-						if (npmRule.test(resourcePath) &&
-							!cssRule.test(resourcePath)) {
-
-							return true;
-						}
-
-						return false;
-					},
-					priority: 5,
-				},
-				lazy: {
-					name: `lazy`,
-					maxSize: 500000,
-					chunks: 'async',
-					priority: 10,
-				},
-			},
-
-
-			chunks: 'async',
-			minChunks: 1,
-			minSize: 30000,
-			name: false
-		},
 
 		minimizer: [
 			new CssMinimizerPlugin({
@@ -335,6 +301,17 @@ const config = {
 							cssDeclarationSorter: false
 						}
 					]
+				},
+			}),
+			new TerserWebpackPlugin({
+				extractComments: false,
+				terserOptions: {
+					format: {
+						comments: false,
+					},
+					compress: {
+						drop_console: true, // 移除 console.log 语句
+					},
 				},
 			}),
 		],
