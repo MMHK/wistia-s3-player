@@ -1,7 +1,8 @@
 <template>
   <div class="video-player-wrap">
     <div v-if="loading" class="loading-spinner"></div>
-    <video ref="player" v-if="!loading" class="video-js"></video>
+    <video ref="player" v-if="!loading && sources.length" class="video-js"></video>
+    <div v-if="hash_id_error" class="hash-error-mask">Media not found.</div>
   </div>
 </template>
 
@@ -24,6 +25,7 @@ export default defineComponent({
       loading: true,
       cover: "",
       sources: [],
+      hash_id_error: false,
     }
   },
 
@@ -77,14 +79,18 @@ export default defineComponent({
             this.watcher.start();
           });
 
-		  player.on('error', function() {
-            var errorDisplayElem = document.querySelector('.vjs-error-display .vjs-modal-dialog-content');
-            if (errorDisplayElem) {
-                errorDisplayElem.innerText = "Media not found.";
-            }
-          });
+          player.on('error', function() {
+                var errorDisplayElem = document.querySelector('.vjs-error-display .vjs-modal-dialog-content');
+                if (errorDisplayElem) {
+                    errorDisplayElem.innerText = "Media not found.";
+                }
+              });
         })
-      });
+      })
+      .catch((err)=>{
+        // console.log(err)
+        this.hash_id_error = true;
+      })
   },
 
   beforeUnmount() {
@@ -106,6 +112,9 @@ export default defineComponent({
                 }
                 return row;
               })
+          })
+          .catch((err)=>{
+            return Promise.reject(err);
           })
           .finally(() => {
             this.loading = false;
@@ -275,6 +284,25 @@ export default defineComponent({
       100% {
         transform: rotate(360deg);
       }
+    }
+
+    .hash-error-mask {
+      box-sizing: border-box;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background: rgba(0, 0, 0, 0.8);
+      background: linear-gradient(180deg, rgba(0, 0, 0, 0.8), rgba(255, 255, 255, 0));
+      overflow: auto;
+      padding: 20px 24px;
+      color: #fff;
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+      text-align: center;
     }
   }
 
