@@ -236,12 +236,12 @@ export default defineComponent({
       line-height: 1.8em;
     }
   }
-  @media screen and (max-width: 1448px) {
+  @media screen and (max-width: 1248px) {
     .video-player-wrap {
       .video-js .vjs-big-play-button{
-        width: d-vw(162px);
-        height: d-vw(104px);
-        font-size: d-vw(90px);
+        width: 12.980769230769232vw;
+        height: 8.333333333333332vw;
+        font-size: 7.211538461538461vw;
       }
     }
   }
@@ -257,9 +257,9 @@ export default defineComponent({
   @media screen and (max-width: 640px) {
     .video-player-wrap {
       .video-js .vjs-big-play-button{
-        width: m-vw(125px);
-        height: m-vw(80px);
-        font-size:m-vw(56px);
+        width: 19.53125vw;
+        height: 12.5vw;
+        font-size: 8.75vw;
       }
     }
 
