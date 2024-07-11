@@ -236,4 +236,32 @@ export default defineComponent({
       line-height: 1.8em;
     }
   }
+  @media screen and (max-width: 1448px) {
+    .video-player-wrap {
+      .video-js .vjs-big-play-button{
+        width: d-vw(162px);
+        height: d-vw(104px);
+        font-size: d-vw(90px);
+      }
+    }
+  }
+  @media screen and (max-width: 960px) {
+    .video-player-wrap {
+      .video-js .vjs-big-play-button{
+        width: 125px;
+        height: 80px;
+        font-size: 56px;
+      }
+    }
+  }
+  @media screen and (max-width: 640px) {
+    .video-player-wrap {
+      .video-js .vjs-big-play-button{
+        width: m-vw(125px);
+        height: m-vw(80px);
+        font-size:m-vw(56px);
+      }
+    }
+
+  }
 </style>
