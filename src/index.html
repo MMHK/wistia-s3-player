@@ -34,7 +34,17 @@
             height: auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
-        .console {
+        .demo-wrap::before {
+            content: "";
+            padding-top: 56%; 
+            display: block;
+            float: left;
+        }
+        .demo-wrap::after {
+            content: "";
+            display: table;
+            clear: both;
+        }        .console {
             background-color: black;
             padding: 1em;
         }
