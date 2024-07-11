@@ -313,4 +313,32 @@ export default defineComponent({
       }
     }
   }
+ @media screen and (max-width: 1248px) {
+    .video-player-wrap {
+      .video-js .vjs-big-play-button{
+        width: 12.980769230769232vw;
+        height: 8.333333333333332vw;
+        font-size: 7.211538461538461vw;
+      }
+    }
+  }
+  @media screen and (max-width: 960px) {
+    .video-player-wrap {
+      .video-js .vjs-big-play-button{
+        width: 2.23em;
+        height: 1.43em;
+        font-size: 5.6em;
+      }
+    }
+  }
+  @media screen and (max-width: 640px) {
+    .video-player-wrap {
+      .video-js .vjs-big-play-button{
+        width: 19.53125vw;
+        height: 12.5vw;
+        font-size: 8.75vw;
+      }
+    }
+
+  }
 </style>
