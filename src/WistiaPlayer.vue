@@ -248,9 +248,9 @@ export default defineComponent({
   @media screen and (max-width: 960px) {
     .video-player-wrap {
       .video-js .vjs-big-play-button{
-        width: 125px;
-        height: 80px;
-        font-size: 56px;
+        width: 2.23em;
+        height: 1.43em;
+        font-size: 5.6em;
       }
     }
   }
