@@ -34,6 +34,18 @@
             height: auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
         }
+        .demo-wrap::before {
+            content: "";
+            padding-top: 56%; 
+            display: block;
+            float: left;
+        }
+        .demo-wrap::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
         @media (max-width: 768px) {
             .demo-wrap {
                 width: 100%;
