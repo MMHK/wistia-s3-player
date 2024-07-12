@@ -1,8 +1,8 @@
-const BaseURL = 'https://s3.ap-southeast-1.amazonaws.com/s3.test.mixmedia.com/wistia-backup/';
+const BaseURL = window.MEDIA_ENDPOINT || 'https://s3.ap-southeast-1.amazonaws.com/s3.test.mixmedia.com/wistia-backup/media';
 
 export default {
   fetchAssets(hashId) {
-      return fetch(`${BaseURL}${hashId}/assets.json`, {
+      return fetch(`${BaseURL}/${hashId}/index.json`, {
           method: 'GET',
           mode: 'cors', // 允许跨域请求
           headers: {
@@ -16,7 +16,7 @@ export default {
               return response.json();
           })
           .then(data => {
-              const list  = Array.from(data);
+              const list  = Array.from(data.assets || []);
               const coverItem = list.find(item => item.type === 'StillImageFile');
               return {
                   cover: coverItem.url,
