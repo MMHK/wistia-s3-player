@@ -1,5 +1,6 @@
 const BaseURL = window.MEDIA_ENDPOINT || 'https://s3.ap-southeast-1.amazonaws.com/s3.test.mixmedia.com/wistia-backup/media';
 
+
 export default {
   fetchAssets(hashId) {
       return fetch(`${BaseURL}/${hashId}/index.json`, {
@@ -18,6 +19,7 @@ export default {
           .then(data => {
               const list  = Array.from(data.assets || []);
               const coverItem = list.find(item => item.type === 'StillImageFile');
+              const thumbnail = list.find(item => item.type === 'StoryboardFile');
               return {
                   cover: coverItem.url,
                   sources: list.filter(item => item.type.includes("VideoFile"))
@@ -27,7 +29,8 @@ export default {
                               type: item.contentType,
                               label: item.height,
                           }
-                      })
+                      }),
+                  thumbnail
               }
           })
   },
