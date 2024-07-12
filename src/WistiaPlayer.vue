@@ -7,14 +7,18 @@
 </template>
 
 <script>
-import videojs from 'video.js'
-import 'video.js/dist/video-js.css'
-import qualitySelector from "@silvermine/videojs-quality-selector"
-import "@silvermine/videojs-quality-selector/dist/css/quality-selector.css"
-import { defineComponent } from 'vue'
+import videojs from 'video.js';
+import 'video.js/dist/video-js.css';
+import qualitySelector from "@silvermine/videojs-quality-selector";
+import "@silvermine/videojs-quality-selector/dist/css/quality-selector.css";
+import { defineComponent } from 'vue';
 import httpService from "./httpService";
 import trackingService from "./trackingService";
+import spriteThumbnails from 'videojs-sprite-thumbnails'; 
+
 qualitySelector(videojs);
+videojs.registerPlugin('spriteThumbnails', spriteThumbnails);
+
 
 export default defineComponent({
   name: "WistiaPlayer",
@@ -26,6 +30,7 @@ export default defineComponent({
       cover: "",
       sources: [],
       hash_id_error: false,
+      thumbnail_data:{},
     }
   },
 
@@ -58,7 +63,6 @@ export default defineComponent({
         playbackRates: [2, 1.75, 1.5, 1.25, 1, 0.75, 0.5],
       }
     },
-
   },
 
   props: {
@@ -78,13 +82,26 @@ export default defineComponent({
             window.dispatchEvent(new CustomEvent("video-player-ready", {detail: shadowPlayer}));
             this.watcher.start();
           });
-
           player.on('error', function() {
-                var errorDisplayElem = document.querySelector('.vjs-error-display .vjs-modal-dialog-content');
-                if (errorDisplayElem) {
-                    errorDisplayElem.innerText = "Media not found.";
-                }
+            var errorDisplayElem = document.querySelector('.vjs-error-display .vjs-modal-dialog-content');
+            if (errorDisplayElem) {
+                errorDisplayElem.innerText = "Media not found.";
+            }
+          });
+
+          if(this.thumbnail_data.url){
+            // 初始化视频缩略图插件
+            player.ready(() => {
+              new spriteThumbnails(player, {
+                url: this.thumbnail_data.url,
+                width:200,
+                height:113,
+                rows: 20,
+                columns: 10,
               });
+            });
+          }
+
         })
       })
       .catch((err)=>{
@@ -112,6 +129,7 @@ export default defineComponent({
                 }
                 return row;
               })
+              this.thumbnail_data = res.thumbnail;
           })
           .catch((err)=>{
             return Promise.reject(err);
@@ -122,6 +140,8 @@ export default defineComponent({
     },
   }
 });
+
+
 </script>
 
 <style lang="scss">
@@ -200,13 +220,45 @@ export default defineComponent({
       }
     }
 
+    //进度条
     .video-js .vjs-play-progress {
       background-color: #fff;
+    }
+
+    .vjs-progress-control .vjs-play-progress .vjs-time-tooltip {
+        display: none;
     }
 
     .video-js .vjs-slider,
     .video-js .vjs-load-progress div {
       background: rgba(255, 255, 255, 0.5);
+    }
+
+    .video-js .vjs-progress-control .vjs-mouse-display {
+      background-color: #fff;
+    }
+
+    //缩略图样式
+    .vjs-mouse-display .vjs-time-tooltip {
+      display: flex !important;
+      justify-content: center;
+      align-items: flex-end;
+      border: none !important;
+
+      &:before {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 50%;
+          width: 40px;
+          height: 25px;
+          border-radius: 3px;
+          background-color: #000;
+          opacity: 0.7;
+          transform: translateX(-50%);
+          z-index: -1;
+          border: none;
+      }
     }
 
     .video-js .vjs-play-control.vjs-ended .vjs-icon-placeholder:before {
