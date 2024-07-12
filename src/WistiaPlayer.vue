@@ -129,7 +129,11 @@ export default defineComponent({
                 }
                 return row;
               })
-              this.thumbnail_data = res.thumbnail;
+              .sort((a, b) => {
+                return a.label - b.label;
+              });
+
+            this.thumbnail_data = res.thumbnail;
           })
           .catch((err)=>{
             return Promise.reject(err);
