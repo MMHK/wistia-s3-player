@@ -160,11 +160,6 @@ export default defineComponent({
       padding-top: 56%; 
     }
 
-
-    .video-js {
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    }
-
     .video-js:hover {
       .vjs-big-play-button {
         background-color: rgba(84, 187, 255, 0.7);
