@@ -20,6 +20,23 @@ qualitySelector(videojs);
 videojs.registerPlugin('spriteThumbnails', spriteThumbnails);
 
 
+const Button = videojs.getComponent('Button');
+class CustomPlayPauseButton extends Button {
+  constructor(player, options) {
+    super(player, options);
+  }
+
+  handleClick() {
+    if (this.player_.paused()) {
+      this.player_.play();
+    } else {
+      this.player_.pause();
+    }
+  }
+}
+videojs.registerComponent('CustomPlayPauseButton', CustomPlayPauseButton);
+
+
 export default defineComponent({
   name: "WistiaPlayer",
 
@@ -61,6 +78,9 @@ export default defineComponent({
         controls: true,
         poster: this.cover,
         playbackRates: [2, 1.75, 1.5, 1.25, 1, 0.75, 0.5],
+        userActions: {
+          hotkeys: true
+        }
       }
     },
   },
@@ -89,9 +109,9 @@ export default defineComponent({
             }
           });
 
-          if(this.thumbnail_data.url){
-            // 初始化视频缩略图插件
-            player.ready(() => {
+          player.ready(() => {
+            if(this.thumbnail_data.url){
+              // 初始化视频缩略图插件
               new spriteThumbnails(player, {
                 url: this.thumbnail_data.url,
                 width:200,
@@ -99,8 +119,9 @@ export default defineComponent({
                 rows: 20,
                 columns: 10,
               });
-            });
-          }
+            }
+            player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
+          });
 
         })
       })
@@ -164,6 +185,7 @@ export default defineComponent({
     .vjs-menu-item {
       &:focus {
         outline: none;
+        border: none;
       }
     }
 
@@ -177,8 +199,13 @@ export default defineComponent({
       }
     }
 
-    .video-js .vjs-tech:focus {
+	.video-js .vjs-tech:focus {
       outline: none;
+    }
+    .vjs-tech {
+      &:focus-visible {
+        outline: none;
+      }
     }
 
     .video-js .vjs-big-play-button {
@@ -369,6 +396,16 @@ export default defineComponent({
       line-height: 1.5;
       text-align: center;
     }
+
+    .custom-play-pause-btn{
+      opacity: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 5em;
+      height: 5em;
+      transform: translate(-50%, -50%) scale(0.8);
+    }
   }
 
   @media (max-width: 768px) {
@@ -376,7 +413,60 @@ export default defineComponent({
       .loading-spinner {
         font-size: 12px;
       }
+
+      .video-js {
+
+        &.vjs-playing {
+          .custom-play-pause-btn .vjs-icon-placeholder::before{
+            content: "\f103";
+          }
+        }
+
+        &.vjs-paused {
+          .custom-play-pause-btn .vjs-icon-placeholder::before{
+            content: "\f101";
+          }
+
+          .custom-play-pause-btn {
+            transform: translate(-50%, -50%) scale(0.9);
+          }
+        }
+      }
+
+      .vjs-has-started {
+        .custom-play-pause-btn{
+          display: block;
+          opacity: 1;
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          width: 5em;
+          height: 5em;
+          transform: translate(-50%, -50%) scale(0.8);
+          font-size: 1.6em;
+          background: rgba(0, 0, 0, 0.6);
+          border: 0px;
+          border-radius: 50%;
+          cursor: pointer;
+          margin: 0px;
+          padding: 0px;
+          pointer-events: auto;
+          outline: none;
+          transition: opacity 200ms ease 0s, transform 600ms ease 0s;
+          -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        }
+
+      }
+      .vjs-user-inactive {
+        .custom-play-pause-btn {
+          opacity: 0;
+          visibility: visible;
+          pointer-events: none;
+          transition: visibility 1s, opacity 1s;
+        }
+      }
     }
+  
   }
  @media screen and (max-width: 1248px) {
     .video-player-wrap {
