@@ -18,3 +18,5 @@ node_modules
 /vendor
 /web
 /.env
+/.pnp.cjs
+/.pnp.loader.mjs

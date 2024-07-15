@@ -15,7 +15,7 @@ const FRP_API_PORT = process.env.FRP_ENDPOINT_PORT || 7001;
 const FRP_API_USER = process.env.FRP_API_USER || 'admin';
 const FRP_API_PWD = process.env.FRP_API_PWD || 'admin';
 const FRP_PUBLIC_DOMAIN = process.env.FRP_PUBLIC_DOMAIN || 'localhost';
-const isDevServer = process.env.WEBPACK_DEV_SERVER || process.env.WEBPACK_SERVE;
+const IN_DEVSERVER = process.env.WEBPACK_DEV_SERVER || process.env.WEBPACK_SERVE;
 
 const checkSubDomainExist = (domain) => {
 	const auth = `${FRP_API_USER}:${FRP_API_PWD}`;
@@ -116,14 +116,13 @@ const getFontmin = () => {
 
 const config = {
 	mode: 'development',
-	entry: [
-		'./src/main.js',
-	],
+	entry: {
+		"wistia-s3-player": ['./src/main.js'],
+	},
 
 	output: {
 		path: path.resolve(__dirname, 'dist'),
-		chunkFilename: 'js/[name].js',
-		filename: 'js/[name].js',
+		filename: IN_DEVSERVER ? 'js/[name].js' : 'js/[name].min.js',
 		assetModuleFilename: 'assets/[hash][ext][query]',
 		publicPath: "auto",
 	},
@@ -151,13 +150,13 @@ const config = {
 
 		new webpack.DefinePlugin({
 			__VUE_OPTIONS_API__: 'true',
-			__VUE_PROD_DEVTOOLS__: isDevServer ? 'true' : 'false',
-			__VUE_PROD_HYDRATION_MISMATCH_DETAILS__: isDevServer ? 'true' : 'false'
+			__VUE_PROD_DEVTOOLS__: IN_DEVSERVER ? 'true' : 'false',
+			__VUE_PROD_HYDRATION_MISMATCH_DETAILS__: IN_DEVSERVER ? 'true' : 'false'
 		}),
 
 		new CleanWebpackPlugin(),
 
-	].concat(HTMlEntryList).concat(isDevServer ? [] : [getFontmin()]),
+	].concat(HTMlEntryList).concat(IN_DEVSERVER ? [] : [getFontmin()]),
 
 	module: {
 		noParse: /^(vue|vue-router|vuex|vuex-router-sync)$/,
@@ -337,10 +336,10 @@ const config = {
 			".demo2.mixmedia.com",
 		],
 	},
-	stats: isDevServer ? "normal" : "errors-warnings",
+	stats: IN_DEVSERVER ? "normal" : "errors-warnings",
 };
 
-if (!isDevServer) {
+if (!IN_DEVSERVER) {
 	module.exports = config;
 	return;
 }

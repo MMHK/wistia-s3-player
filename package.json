@@ -1,8 +1,14 @@
 {
   "name": "wistia-s3-player",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "An alternative to a Wistia inline player.",
-  "main": "index.html",
+  "main": "dist/js/wistia-s3-player.min.js",
+  "files": [
+    "dist/**/*",
+    "src/",
+    "package.json",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --mode=production --progress",
     "serve": "cross-env NODE_ENV=development FRP_ENDPOINT=192.168.33.6 FRP_PUBLIC_DOMAIN=dev.mixmedia.com webpack-dev-server",
@@ -38,8 +44,10 @@
     "cross-env": "^7.0.2",
     "css-loader": "^6.7.3",
     "css-minimizer-webpack-plugin": "^4.2.2",
+    "debug": "^4.3.5",
     "expose-loader": "^4.1.0",
     "file-loader": "^6.2.0",
+    "fontmin": "^1.1.0",
     "fontmin-webpack": "^4.0.0",
     "glob": "^9.3.0",
     "html-loader": "^4.2.0",
@@ -48,10 +56,12 @@
     "html-webpack-tags-plugin": "^3.0.2",
     "inquirer": "^6.5",
     "loader-utils": "^3.2.1",
+    "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^2.7.5",
     "mmhk-frp": "^1.1.0",
     "mocha": "^10.2.0",
     "mocha-logger": "^1.0.6",
+    "postcss": "^8.4.39",
     "postcss-fontpath": "^1.0.0",
     "postcss-loader": "^7.1",
     "raw-loader": "^4.0.2",
@@ -59,7 +69,9 @@
     "sass-loader": "^13.2.0",
     "string.prototype.matchall": "^4.0.0",
     "style-loader": "^3.3.2",
+    "terser-webpack-plugin": "^5.3.10",
     "tiny-emitter": "^2.1.0",
+    "ttf2woff2": "^5.0.0",
     "url-loader": "^4.1.1",
     "vue-loader": "^17.4.2",
     "vue-style-loader": "^4.1.3",
@@ -67,15 +79,17 @@
     "webpack-cli": "^5.0.1",
     "webpack-dev-server": "^4.13.0",
     "webpack-env": "^0.8.0",
-    "webpack-merge": "^5.10.0"
+    "webpack-merge": "^5.10.0",
+    "webpack-sources": "^3.2.3"
   },
   "dependencies": {
     "@silvermine/videojs-quality-selector": "^1.3.1",
+    "@vue/runtime-dom": "^3.4.31",
     "axios": "^1.6.8",
     "normalize.css": "^8.0.1",
     "video.js": "^8.12.0",
     "videojs-sprite-thumbnails": "^2.2.1",
-    "vue": "^3.4.26"
+    "vue": "^3.4.31"
   },
   "browserslist": [
     "last 5 version",
