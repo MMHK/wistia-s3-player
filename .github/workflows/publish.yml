@@ -48,9 +48,11 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Create and push tag
-          if: steps.version_check.outputs.version_changed == 'true'
-          run: |
-            git tag -a "v$CURRENT_VERSION" -m "Release version $CURRENT_VERSION"
-            git push origin "v$CURRENT_VERSION"
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        if: steps.version_check.outputs.version_changed == 'true'
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git tag -a "v$CURRENT_VERSION" -m "Release version $CURRENT_VERSION"
+          git push origin "v$CURRENT_VERSION"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
