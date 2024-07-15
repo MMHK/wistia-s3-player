@@ -160,6 +160,17 @@ export default defineComponent({
       padding-top: 56%; 
     }
 
+    button,
+    .vjs-menu-item {
+      &:focus {
+        outline: none;
+      }
+    }
+
+    .video-js {
+      background-color: transparent;
+    }
+
     .video-js:hover {
       .vjs-big-play-button {
         background-color: rgba(84, 187, 255, 0.7);
