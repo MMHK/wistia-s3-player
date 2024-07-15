@@ -1,6 +1,6 @@
 {
   "name": "wistia-s3-player",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "An alternative to a Wistia inline player.",
   "main": "dist/js/wistia-s3-player.min.js",
   "files": [
