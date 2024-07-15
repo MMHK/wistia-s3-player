@@ -14,7 +14,7 @@ import "@silvermine/videojs-quality-selector/dist/css/quality-selector.css";
 import { defineComponent } from 'vue';
 import httpService from "./httpService";
 import trackingService from "./trackingService";
-import spriteThumbnails from 'videojs-sprite-thumbnails'; 
+import spriteThumbnails from 'videojs-sprite-thumbnails';
 
 qualitySelector(videojs);
 videojs.registerPlugin('spriteThumbnails', spriteThumbnails);
@@ -157,7 +157,7 @@ export default defineComponent({
 
     &:before {
       content: "";
-      padding-top: 56%; 
+      padding-top: 56%;
     }
 
     button,
@@ -177,6 +177,9 @@ export default defineComponent({
       }
     }
 
+    .video-js .vjs-tech:focus {
+      outline: none;
+    }
 
     .video-js .vjs-big-play-button {
       width: 2.5em;
@@ -333,8 +336,8 @@ export default defineComponent({
       font-size: 20px;
       width: 3em;
       height: 3em;
-      border: 0.4em solid #f3f3f3; 
-      border-top: 0.4em solid #54bbff; 
+      border: 0.4em solid #f3f3f3;
+      border-top: 0.4em solid #54bbff;
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
