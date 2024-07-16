@@ -122,13 +122,13 @@ export default defineComponent({
             }
             player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
           });
-
         })
       })
       .catch((err)=>{
         // console.log(err)
         this.hash_id_error = true;
       })
+
   },
 
   beforeUnmount() {
@@ -165,8 +165,6 @@ export default defineComponent({
     },
   }
 });
-
-
 </script>
 
 <style lang="scss">
@@ -191,6 +189,27 @@ export default defineComponent({
 
     .video-js {
       background-color: transparent;
+
+      &.vjs-device-ipad {
+       .vjs-control-bar {
+        opacity: 1;
+       }
+
+       .custom-play-pause-btn {
+        display: none;
+        top:0;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 4.4em);
+        transform: translate(0, 0) scale(1);
+       }
+      }
+
+      &.vjs-has-started.vjs-device-ipad {
+        .custom-play-pause-btn {
+          display: block;
+        }
+      }
     }
 
     .video-js:hover {
@@ -209,6 +228,7 @@ export default defineComponent({
     }
 
     .video-js .vjs-big-play-button {
+      z-index: 9;
       width: 2.5em;
       font-size: 5.6em;
       border-radius: 0;
@@ -226,7 +246,7 @@ export default defineComponent({
         height: 100%;
 
         &:before {
-          width: auto;
+          width: 100%;
           height: auto;
           top: 50%;
           left: 50%;
@@ -243,6 +263,7 @@ export default defineComponent({
       transition: visibility 0.1s, opacity 0.1s;
       background-color: rgba(84, 187, 255, 0.7);
       vertical-align: middle;
+      z-index: 9;
     }
 
     .video-js .vjs-duration {
@@ -456,6 +477,20 @@ export default defineComponent({
           -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         }
 
+        .custom-play-pause-btn .vjs-icon-placeholder {
+          position: relative;
+          width: 100%;
+          height: 100%;
+        }
+
+        .custom-play-pause-btn .vjs-icon-placeholder::before {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          height: auto;
+          transform: translate(-50%, -50%); 
+        }
+
       }
       .vjs-user-inactive {
         .custom-play-pause-btn {
@@ -464,6 +499,16 @@ export default defineComponent({
           pointer-events: none;
           transition: visibility 1s, opacity 1s;
         }
+
+        &.vjs-paused {
+          .custom-play-pause-btn {
+            opacity: 1;
+          }
+        }
+      }
+
+      .vjs-volume-panel {
+        display: none;
       }
     }
   
