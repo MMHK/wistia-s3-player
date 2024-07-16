@@ -122,13 +122,13 @@ export default defineComponent({
             }
             player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
           });
-
         })
       })
       .catch((err)=>{
         // console.log(err)
         this.hash_id_error = true;
       })
+
   },
 
   beforeUnmount() {
@@ -453,6 +453,20 @@ export default defineComponent({
           -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
         }
 
+        .custom-play-pause-btn .vjs-icon-placeholder {
+          position: relative;
+          width: 100%;
+          height: 100%;
+        }
+
+        .custom-play-pause-btn .vjs-icon-placeholder::before {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          height: auto;
+          transform: translate(-50%, -50%); 
+        }
+
       }
       .vjs-user-inactive {
         .custom-play-pause-btn {
@@ -461,6 +475,16 @@ export default defineComponent({
           pointer-events: none;
           transition: visibility 1s, opacity 1s;
         }
+
+        &.vjs-paused {
+          .custom-play-pause-btn {
+            opacity: 1;
+          }
+        }
+      }
+
+      .vjs-volume-panel {
+        display: none;
       }
     }
   
