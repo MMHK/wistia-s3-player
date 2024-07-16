@@ -21,21 +21,47 @@ videojs.registerPlugin('spriteThumbnails', spriteThumbnails);
 
 
 const Button = videojs.getComponent('Button');
+
 class CustomPlayPauseButton extends Button {
   constructor(player, options) {
     super(player, options);
+    this.on('click', this.handleClick);
+    this.on('touchstart', this.handleTouchStart);
+    player.on('pause', this.handlePause.bind(this));
+    player.on('play', this.handlePlay.bind(this));
   }
 
-  handleClick() {
-    if (this.player_.paused()) {
-      this.player_.play();
+  handleClick(event) {
+    event.stopPropagation(); 
+    const player = this.player();
+
+    if (player.paused()) {
+      player.play();
     } else {
-      this.player_.pause();
+      player.pause();
     }
   }
-}
-videojs.registerComponent('CustomPlayPauseButton', CustomPlayPauseButton);
 
+  handleTouchStart(event) {
+    event.stopPropagation(); 
+  }
+
+  handlePause() {
+    const playerElement = this.player().el();
+    playerElement.classList.add('user-pause');
+  }
+
+  handlePlay() {
+    const playerElement = this.player().el();
+    playerElement.classList.remove('user-pause');
+  }
+
+  buildCSSClass() {
+    return `vjs-custom-play-pause-button ${super.buildCSSClass()}`;
+  }
+}
+
+videojs.registerComponent('CustomPlayPauseButton', CustomPlayPauseButton);
 
 export default defineComponent({
   name: "WistiaPlayer",
@@ -207,6 +233,18 @@ export default defineComponent({
 
       &.vjs-has-started.vjs-device-ipad {
         .custom-play-pause-btn {
+          display: block;
+        }
+      }
+
+      //切换画质
+      &.user-pause {
+        .vjs-big-play-button,
+        .vjs-duration {
+          display: none;
+        }
+
+        .vjs-current-time {
           display: block;
         }
       }
