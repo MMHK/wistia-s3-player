@@ -165,8 +165,6 @@ export default defineComponent({
     },
   }
 });
-
-
 </script>
 
 <style lang="scss">
@@ -191,6 +189,27 @@ export default defineComponent({
 
     .video-js {
       background-color: transparent;
+
+      &.vjs-device-ipad {
+       .vjs-control-bar {
+        opacity: 1;
+       }
+
+       .custom-play-pause-btn {
+        display: none;
+        top:0;
+        left: 0;
+        width: 100%;
+        height: calc(100% - 4.4em);
+        transform: translate(0, 0) scale(1);
+       }
+      }
+
+      &.vjs-has-started.vjs-device-ipad {
+        .custom-play-pause-btn {
+          display: block;
+        }
+      }
     }
 
     .video-js:hover {
@@ -206,6 +225,7 @@ export default defineComponent({
     }
 
     .video-js .vjs-big-play-button {
+      z-index: 9;
       width: 2.5em;
       font-size: 5.6em;
       border-radius: 0;
@@ -223,7 +243,7 @@ export default defineComponent({
         height: 100%;
 
         &:before {
-          width: auto;
+          width: 100%;
           height: auto;
           top: 50%;
           left: 50%;
@@ -240,6 +260,7 @@ export default defineComponent({
       transition: visibility 0.1s, opacity 0.1s;
       background-color: rgba(84, 187, 255, 0.7);
       vertical-align: middle;
+      z-index: 9;
     }
 
     .video-js .vjs-duration {
