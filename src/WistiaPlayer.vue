@@ -144,6 +144,7 @@ export default defineComponent({
                 height:113,
                 rows: 20,
                 columns: 10,
+                interval: 0.885,
               });
             }
             player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
