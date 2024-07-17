@@ -147,6 +147,19 @@ export default defineComponent({
               });
             }
             player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
+
+            player.on('timeupdate', () => {
+              //pc mobile
+              if (!player.el().classList.contains('vjs-device-ipad') && !player.el().classList.contains('vjs-has-started')) {
+                this.tryPlay(player)
+              }
+
+              //ipad
+              if (player.el().classList.contains('vjs-device-ipad') && !player.el().classList.contains('vjs-has-started')) {
+                player.el().classList.add('vjs-has-started');
+              }
+            });
+
           });
         })
       })
@@ -188,6 +201,13 @@ export default defineComponent({
           .finally(() => {
             this.loading = false;
           });
+    },
+
+    //处理视频播放出错
+    tryPlay(player) {
+      player.play().catch((error) => {
+        console.log(error);
+      });
     },
   }
 });
