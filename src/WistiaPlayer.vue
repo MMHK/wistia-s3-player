@@ -32,7 +32,7 @@ class CustomPlayPauseButton extends Button {
   }
 
   handleClick(event) {
-    event.stopPropagation(); 
+    event.stopPropagation();
     const player = this.player();
 
     if (player.paused()) {
@@ -43,7 +43,7 @@ class CustomPlayPauseButton extends Button {
   }
 
   handleTouchStart(event) {
-    event.stopPropagation(); 
+    event.stopPropagation();
   }
 
   handlePause() {
@@ -74,6 +74,7 @@ export default defineComponent({
       sources: [],
       hash_id_error: false,
       thumbnail_data:{},
+      videoName: "",
     }
   },
 
@@ -123,7 +124,7 @@ export default defineComponent({
       .then(() => {
         this.$nextTick(() => {
           const player = videojs(this.$refs.player, this.options, () => {
-            this.watcher = trackingService(player);
+            this.watcher = trackingService(player, this.id, this.videoName);
             const shadowPlayer = this.watcher.onReady();
             window.dispatchEvent(new CustomEvent("video-player-ready", {detail: shadowPlayer}));
             this.watcher.start();
@@ -170,6 +171,7 @@ export default defineComponent({
       return httpService.fetchAssets(hashId)
           .then(res => {
             this.cover = res.cover;
+            this.videoName = res.name;
             this.sources = Array.from(res.sources)
               .map((row) => {
                 if (row.label > 640 && row.label < 1080) {
@@ -527,7 +529,7 @@ export default defineComponent({
           top: 50%;
           left: 50%;
           height: auto;
-          transform: translate(-50%, -50%); 
+          transform: translate(-50%, -50%);
         }
 
       }
@@ -550,7 +552,7 @@ export default defineComponent({
         display: none;
       }
     }
-  
+
   }
  @media screen and (max-width: 1248px) {
     .video-player-wrap {

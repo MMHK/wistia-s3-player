@@ -92,6 +92,13 @@
             var pre = document.querySelector(".console pre");
             pre.innerHTML = buffer.join("\n");
         }
+
+        window.dataLayer = {
+            push: function () {
+                writeLog(JSON.stringify(arguments));
+            },
+        };
+
         window.addEventListener("video-player-ready", function (e) {
             var player = e.detail;
             player.bind("play", function () {
