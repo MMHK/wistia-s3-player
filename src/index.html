@@ -93,7 +93,7 @@
             pre.innerHTML = buffer.join("\n");
         }
 
-        window.dataLayer = {
+        window.dataLayer = window.dataLayer || {
             push: function () {
                 writeLog(JSON.stringify(arguments));
             },

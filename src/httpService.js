@@ -22,6 +22,7 @@ export default {
               const thumbnail = list.find(item => item.type === 'StoryboardFile');
               return {
                   cover: coverItem.url,
+                  name: data.name,
                   sources: list.filter(item => item.type.includes("VideoFile"))
                       .map(item => {
                           return {

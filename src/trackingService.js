@@ -20,41 +20,52 @@ const storagePull = (key, defaultValue = null) => {
  */
 const dataLayerHandler = (hashId, Name, player) => {
     const storageKey = `wistia-video-progress-${hashId}`;
+    let timerId = 0;
+    window.dataLayer = window.dataLayer || [];
+    let lastPercent = 0;
+    let lastTime = 0;
 
     const timerHandler = () => {
-        const data = storagePull(storageKey, {lastTime: 0});
-        if (data) {
-            const {lastTime} = data;
-            if (lastTime) {
-                const currentTime = player.currentTime();
-                if (currentTime > data.lastTime) {
-                    dataLayer.push("event", "wistia_seconds_played", {
-                        event_category: "Video",
-                        event_label: Name,
-                        value: Math.round(currentTime - data.lastTime),
-                        channel_hashed_id: undefined,
-                        video_hashed_id: hashId,
-                    });
+        const currentTime = player.currentTime();
+        if (currentTime > lastTime) {
+            window.dataLayer.push({
+                event: "wistia_seconds_played",
+                eventModel: {
+                    event_category: "Video",
+                    event_label: Name,
+                    video_hashed_id: hashId,
+                    value: Math.round(currentTime - lastTime),
                 }
-            }
+            });
+
+            lastTime = currentTime;
         }
     };
-    let timerId = 0;
-    let dataLayer = window.dataLayer || [];
-    let lastPercent = 0;
 
     return {
         destroy() {
             clearInterval(timerId);
         },
+        ended() {
+            clearInterval(timerId);
+            timerHandler();
+            timerId = 0;
+        },
         play() {
-            dataLayer.push("event", "wistia_play", {
-                event_category: "Video",
-                event_label: Name,
-                value: undefined,
-                channel_hashed_id: undefined,
-                video_hashed_id: hashId,
+            window.dataLayer.push({
+                event: "wistia_play",
+                eventModel: {
+                    event_category: "Video",
+                    event_label: Name,
+                    video_hashed_id: hashId,
+                }
             });
+            const oriData = storagePull(storageKey,{lastTime:0});
+            console.log(lastTime, oriData);
+            if (lastTime > oriData.lastTime) {
+                timerHandler();
+            }
+
             if (!timerId) {
                 timerId = setInterval(timerHandler, 60000);
             }
@@ -72,12 +83,13 @@ const dataLayerHandler = (hashId, Name, player) => {
 
                 if ([25, 50, 75, 95].includes(percentWatched)) {
                     if (percentWatched > dataExist.lastPercent) {
-                        dataLayer.push("event", `wistia_${percentWatched}_percent_played`, {
-                            event_category: "Video",
-                            event_label: Name,
-                            value: undefined,
-                            channel_hashed_id: undefined,
-                            video_hashed_id: hashId,
+                        window.dataLayer.push({
+                            event: `wistia_${percentWatched}_percent_played`,
+                            eventModel: {
+                                event_category: "Video",
+                                event_label: Name,
+                                video_hashed_id: hashId,
+                            }
                         });
                     }
                     dataExist.lastPercent = percentWatched;
