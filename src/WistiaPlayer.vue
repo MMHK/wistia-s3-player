@@ -129,6 +129,17 @@ export default defineComponent({
             window.dispatchEvent(new CustomEvent("video-player-ready", {detail: shadowPlayer}));
             this.watcher.start();
           });
+
+          // 恢复播放时间
+          const savedTime = localStorage.getItem(`video-${this.id}-currentTime`);
+          if (savedTime) {
+            const formatTime = parseFloat(savedTime)
+            if(formatTime > 10) {
+              player.currentTime(formatTime);
+              player.addClass('video-reload');
+            }
+          }
+
           player.on('error', function() {
             var errorDisplayElem = document.querySelector('.vjs-error-display .vjs-modal-dialog-content');
             if (errorDisplayElem) {
@@ -149,6 +160,26 @@ export default defineComponent({
               });
             }
             player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
+
+            player.on('timeupdate', () => {
+              //pc mobile
+              if (!player.el().classList.contains('vjs-device-ipad') && !player.el().classList.contains('vjs-has-started')) {
+                this.tryPlay(player)
+              }
+
+              //ipad
+              if (player.el().classList.contains('vjs-device-ipad') && !player.el().classList.contains('vjs-has-started')) {
+                player.el().classList.add('vjs-has-started');
+              }
+
+              localStorage.setItem(`video-${this.id}-currentTime`, player.currentTime());
+            });
+
+            player.on('ended', () => {
+              localStorage.removeItem(`video-${this.id}-currentTime`);
+              player.removeClass('video-reload');
+            });
+
           });
         })
       })
@@ -191,6 +222,13 @@ export default defineComponent({
           .finally(() => {
             this.loading = false;
           });
+    },
+
+    //处理视频播放出错
+    tryPlay(player) {
+      player.play().catch((error) => {
+        console.log(error);
+      });
     },
   }
 });
@@ -311,7 +349,8 @@ export default defineComponent({
       display: block;
     }
 
-    .vjs-has-started.video-js {
+    .vjs-has-started.video-js,
+    .video-reload.video-js {
 
       .vjs-duration {
         display: none;
