@@ -61,7 +61,7 @@ const dataLayerHandler = (hashId, Name, player) => {
                 }
             });
             const oriData = storagePull(storageKey,{lastTime:0});
-            console.log(lastTime, oriData);
+            // console.log(lastTime, oriData);
             if (lastTime > oriData.lastTime) {
                 timerHandler();
             }
@@ -79,7 +79,7 @@ const dataLayerHandler = (hashId, Name, player) => {
                 && percentWatched != lastPercent) {
                 lastPercent = percentWatched;
 
-                console.log(percentWatched)
+                // console.log(percentWatched)
 
                 if ([25, 50, 75, 95].includes(percentWatched)) {
                     if (percentWatched > dataExist.lastPercent) {

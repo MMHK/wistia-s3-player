@@ -147,18 +147,23 @@ export default defineComponent({
             }
           });
 
-          player.ready(() => {
+          player.on('loadedmetadata', () => {
             if(this.thumbnail_data.url){
               // 初始化视频缩略图插件
+              const computed_interval = player.duration() / 200;  
               new spriteThumbnails(player, {
                 url: this.thumbnail_data.url,
-                width:200,
-                height:113,
+                width: 200,
+                height: 113,
                 rows: 20,
                 columns: 10,
-                interval: 0.885,
+                interval: computed_interval,
               });
             }
+          });
+
+          player.ready(() => {
+
             player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
 
             player.on('timeupdate', () => {
