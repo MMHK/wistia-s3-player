@@ -19,8 +19,8 @@ import spriteThumbnails from 'videojs-sprite-thumbnails';
 qualitySelector(videojs);
 videojs.registerPlugin('spriteThumbnails', spriteThumbnails);
 
-
 const Button = videojs.getComponent('Button');
+const PlaybackRateMenuButton = videojs.getComponent('PlaybackRateMenuButton');
 
 class CustomPlayPauseButton extends Button {
   constructor(player, options) {
@@ -61,7 +61,69 @@ class CustomPlayPauseButton extends Button {
   }
 }
 
+class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
+  constructor(player, options) {
+    super(player, options);
+    this.on('click', this.handleClick);
+    document.addEventListener('click', this.handleDocumentClick.bind(this));
+    document.addEventListener('touchend', this.handleDocumentTouch.bind(this));
+  }
+
+  handleClick(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    if (this.menu) {
+      if (this.menu.hasClass('vjs-lock-showing')) {
+        this.menu.hide();
+        this.menu.removeClass('vjs-lock-showing');
+      } else {
+        this.menu.show();
+        this.menu.addClass('vjs-lock-showing');
+      }
+    }
+
+    const qualitySelector = document.querySelector('.vjs-quality-selector .vjs-menu');
+    if (qualitySelector) {
+      qualitySelector.classList.remove('vjs-lock-showing')
+    }
+
+  }
+
+
+  handleDocumentClick(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    const clickedElement = event.target;
+    if (clickedElement.closest('.vjs-quality-selector')) {
+      this.hideMenu();
+    }
+  }
+
+  handleDocumentTouch(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    const touchedElement = event.target;
+    if (touchedElement.closest('.vjs-quality-selector')) {
+      this.hideMenu();
+    }
+  }
+
+  hideMenu() {
+    if (this.menu && this.menu.hasClass('vjs-lock-showing')) {
+      this.menu.hide();
+      this.menu.removeClass('vjs-lock-showing');
+    }
+  }
+
+  dispose() {
+    document.removeEventListener('click', this.handleDocumentClick.bind(this));
+    document.removeEventListener('touchend', this.handleDocumentTouch.bind(this));
+    super.dispose();
+  }
+}
+
 videojs.registerComponent('CustomPlayPauseButton', CustomPlayPauseButton);
+videojs.registerComponent('CustomPlaybackRateMenuButton', CustomPlaybackRateMenuButton);
 
 export default defineComponent({
   name: "WistiaPlayer",
@@ -73,7 +135,7 @@ export default defineComponent({
       cover: "",
       sources: [],
       hash_id_error: false,
-      thumbnail_data:{},
+      thumbnail_data: {},
       videoName: "",
     }
   },
@@ -93,7 +155,7 @@ export default defineComponent({
               vertical: true
             },
             'qualitySelector',
-            'playbackRateMenuButton',
+            'CustomPlaybackRateMenuButton',
             'fullscreenToggle',
           ],
         },
@@ -108,7 +170,7 @@ export default defineComponent({
         userActions: {
           hotkeys: true
         }
-      }
+      };
     },
   },
 
@@ -348,6 +410,12 @@ export default defineComponent({
       background-color: rgba(84, 187, 255, 0.7);
       vertical-align: middle;
       z-index: 9;
+
+      .vjs-button{
+        &:hover {
+          background-color: rgba(0, 0, 0, .2);
+        }
+      }
     }
 
     .video-js .vjs-duration {
@@ -411,33 +479,53 @@ export default defineComponent({
       content: "\f101";
     }
 
-    .vjs-menu-button-popup .vjs-menu {
-      bottom: 0;
-      right: 0;
-      left: 0;
-      margin-bottom: 4.4em;
+    //音量
+    .vjs-volume-panel.vjs-control.vjs-volume-panel-vertical {
+      &.vjs-hover {
+        .vjs-volume-control.vjs-volume-vertical { 
+          left: -4em;
+        }
+      }
+
+    }
+    .video-js .vjs-volume-panel .vjs-volume-control.vjs-volume-vertical {
+      width: 4em;
+      z-index: 9;
+      margin-left: 0;
+    }
+
+    .vjs-menu-button-popup {
+
+      .vjs-menu {
+        bottom: 0;
+        right: 0;
+        left: 0;
+        margin-bottom: 4.4em;
+      }
+
+      &.vjs-hover {
+        .vjs-menu {
+          display: none;
+        }
+      }
     }
 
     .vjs-menu-button-popup .vjs-menu .vjs-menu-content {
-      width: 13.6em;
+      width: 13.1em;
+      left: -4em;
       bottom: 0;
-      left: -5.1em;
       max-height: none;
     }
 
     .vjs-quality-selector .vjs-menu .vjs-menu-content {
-      left: -1.1em;
+      left: 0;
     }
 
     .vjs-playback-rate.vjs-control{
-      width: 4.5em;
-    }
+      width: 5.1em;
 
-    .vjs-quality-selector .vjs-menu,
-    .vjs-playback-rate .vjs-menu{
-      display: none;
-      &:hover{
-        display: block;
+      .vjs-menu-button {
+        padding: 0;
       }
     }
 
@@ -573,7 +661,7 @@ export default defineComponent({
           top: 50%;
           left: 50%;
           height: auto;
-          transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%); 
         }
 
       }
@@ -596,7 +684,7 @@ export default defineComponent({
         display: none;
       }
     }
-
+  
   }
  @media screen and (max-width: 1248px) {
     .video-player-wrap {
