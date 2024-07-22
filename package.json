@@ -12,6 +12,7 @@
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --mode=production --progress",
     "serve": "cross-env NODE_ENV=development FRP_ENDPOINT=192.168.33.6 FRP_PUBLIC_DOMAIN=dev.mixmedia.com webpack-dev-server",
+    "demo": "cross-env NODE_ENV=production EXPORT_DEMO=true webpack --mode=production --progress",
     "test": "mocha"
   },
   "author": "Mixmedia",

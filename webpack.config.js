@@ -16,6 +16,7 @@ const FRP_API_USER = process.env.FRP_API_USER || 'admin';
 const FRP_API_PWD = process.env.FRP_API_PWD || 'admin';
 const FRP_PUBLIC_DOMAIN = process.env.FRP_PUBLIC_DOMAIN || 'localhost';
 const IN_DEVSERVER = process.env.WEBPACK_DEV_SERVER || process.env.WEBPACK_SERVE;
+const EXPORT_DEMO = process.env.EXPORT_DEMO;
 
 const checkSubDomainExist = (domain) => {
 	const auth = `${FRP_API_USER}:${FRP_API_PWD}`;
@@ -121,7 +122,7 @@ const config = {
 	},
 
 	output: {
-		path: path.resolve(__dirname, 'dist'),
+		path: path.resolve(__dirname,  (EXPORT_DEMO ? 'demo' : 'dist')),
 		filename: IN_DEVSERVER ? 'js/[name].js' : 'js/[name].min.js',
 		assetModuleFilename: 'assets/[hash][ext][query]',
 		publicPath: "auto",
@@ -153,7 +154,7 @@ const config = {
 
 		new webpack.DefinePlugin({
 			__VUE_OPTIONS_API__: 'true',
-			__VUE_PROD_DEVTOOLS__: IN_DEVSERVER ? 'true' : 'false',
+			__VUE_PROD_DEVTOOLS__: (IN_DEVSERVER || EXPORT_DEMO) ? 'true' : 'false',
 			__VUE_PROD_HYDRATION_MISMATCH_DETAILS__: IN_DEVSERVER ? 'true' : 'false'
 		}),
 

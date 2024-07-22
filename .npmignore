@@ -1,4 +1,5 @@
 test/
+demo/
 .yarn
 .DS_Store
 node_modules/
