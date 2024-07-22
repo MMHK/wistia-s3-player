@@ -125,6 +125,9 @@ const config = {
 		filename: IN_DEVSERVER ? 'js/[name].js' : 'js/[name].min.js',
 		assetModuleFilename: 'assets/[hash][ext][query]',
 		publicPath: "auto",
+		library: 'WistiaS3Player', // 库的全局变量名
+		libraryTarget: 'umd', // 库的模块定义方式
+		globalObject: 'this', // 适用于 Node.js 和浏览器环境
 	},
 
 	resolve: {
