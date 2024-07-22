@@ -28,15 +28,16 @@ const dataLayerHandler = (hashId, Name, player) => {
     const timerHandler = () => {
         const currentTime = player.currentTime();
         if (currentTime > lastTime) {
-            window.dataLayer.push({
-                event: "wistia_seconds_played",
-                eventModel: {
+            window.dataLayer.push([
+                "event",
+                "wistia_seconds_played",
+                {
                     event_category: "Video",
                     event_label: Name,
                     video_hashed_id: hashId,
                     value: Math.round(currentTime - lastTime),
                 }
-            });
+            ])
 
             lastTime = currentTime;
         }
@@ -52,14 +53,15 @@ const dataLayerHandler = (hashId, Name, player) => {
             timerId = 0;
         },
         play() {
-            window.dataLayer.push({
-                event: "wistia_play",
-                eventModel: {
+            window.dataLayer.push([
+                "event",
+                "wistia_play",
+                {
                     event_category: "Video",
                     event_label: Name,
                     video_hashed_id: hashId,
                 }
-            });
+            ]);
             const oriData = storagePull(storageKey,{lastTime:0});
             // console.log(lastTime, oriData);
             if (lastTime > oriData.lastTime) {
@@ -83,14 +85,15 @@ const dataLayerHandler = (hashId, Name, player) => {
 
                 if ([25, 50, 75, 95].includes(percentWatched)) {
                     if (percentWatched > dataExist.lastPercent) {
-                        window.dataLayer.push({
-                            event: `wistia_${percentWatched}_percent_played`,
-                            eventModel: {
+                        window.dataLayer.push([
+                            "event",
+                            `wistia_${percentWatched}_percent_played`,
+                            {
                                 event_category: "Video",
                                 event_label: Name,
                                 video_hashed_id: hashId,
                             }
-                        });
+                        ]);
                     }
                     dataExist.lastPercent = percentWatched;
                 }
