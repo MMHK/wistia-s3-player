@@ -336,7 +336,14 @@ export default defineComponent({
         width: 100%;
         height: calc(100% - 4.4em);
         transform: translate(0, 0) scale(1);
-       }
+       }       
+      }
+
+      &.vjs-device-ipad,
+      &.vjs-device-iphone{
+        .vjs-volume-panel {
+          display: none;
+        }
       }
 
       &.vjs-has-started.vjs-device-ipad {
@@ -356,6 +363,7 @@ export default defineComponent({
           display: block;
         }
       }
+      
     }
 
     .video-js:hover {
@@ -678,10 +686,6 @@ export default defineComponent({
             opacity: 1;
           }
         }
-      }
-
-      .vjs-volume-panel {
-        display: none;
       }
     }
   
