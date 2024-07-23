@@ -20,15 +20,11 @@ qualitySelector(videojs);
 videojs.registerPlugin('spriteThumbnails', spriteThumbnails);
 
 const Button = videojs.getComponent('Button');
-const PlaybackRateMenuButton = videojs.getComponent('PlaybackRateMenuButton');
 
 class CustomPlayPauseButton extends Button {
   constructor(player, options) {
     super(player, options);
     this.on('click', this.handleClick);
-    this.on('touchstart', this.handleTouchStart);
-    player.on('pause', this.handlePause.bind(this));
-    player.on('play', this.handlePlay.bind(this));
   }
 
   handleClick(event) {
@@ -42,88 +38,13 @@ class CustomPlayPauseButton extends Button {
     }
   }
 
-  handleTouchStart(event) {
-    event.stopPropagation();
-  }
-
-  handlePause() {
-    const playerElement = this.player().el();
-    playerElement.classList.add('user-pause');
-  }
-
-  handlePlay() {
-    const playerElement = this.player().el();
-    playerElement.classList.remove('user-pause');
-  }
-
   buildCSSClass() {
     return `vjs-custom-play-pause-button ${super.buildCSSClass()}`;
   }
 }
 
-class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
-  constructor(player, options) {
-    super(player, options);
-    this.on('click', this.handleClick);
-    document.addEventListener('click', this.handleDocumentClick.bind(this));
-    document.addEventListener('touchend', this.handleDocumentTouch.bind(this));
-  }
-
-  handleClick(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    if (this.menu) {
-      if (this.menu.hasClass('vjs-lock-showing')) {
-        this.menu.hide();
-        this.menu.removeClass('vjs-lock-showing');
-      } else {
-        this.menu.show();
-        this.menu.addClass('vjs-lock-showing');
-      }
-    }
-
-    const qualitySelector = document.querySelector('.vjs-quality-selector .vjs-menu');
-    if (qualitySelector) {
-      qualitySelector.classList.remove('vjs-lock-showing')
-    }
-
-  }
-
-
-  handleDocumentClick(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    const clickedElement = event.target;
-    if (clickedElement.closest('.vjs-quality-selector')) {
-      this.hideMenu();
-    }
-  }
-
-  handleDocumentTouch(event) {
-    event.stopPropagation();
-    event.preventDefault();
-    const touchedElement = event.target;
-    if (touchedElement.closest('.vjs-quality-selector')) {
-      this.hideMenu();
-    }
-  }
-
-  hideMenu() {
-    if (this.menu && this.menu.hasClass('vjs-lock-showing')) {
-      this.menu.hide();
-      this.menu.removeClass('vjs-lock-showing');
-    }
-  }
-
-  dispose() {
-    document.removeEventListener('click', this.handleDocumentClick.bind(this));
-    document.removeEventListener('touchend', this.handleDocumentTouch.bind(this));
-    super.dispose();
-  }
-}
 
 videojs.registerComponent('CustomPlayPauseButton', CustomPlayPauseButton);
-videojs.registerComponent('CustomPlaybackRateMenuButton', CustomPlaybackRateMenuButton);
 
 export default defineComponent({
   name: "WistiaPlayer",
@@ -155,7 +76,7 @@ export default defineComponent({
               vertical: true
             },
             'qualitySelector',
-            'CustomPlaybackRateMenuButton',
+            'PlaybackRateMenuButton',
             'fullscreenToggle',
           ],
         },
@@ -212,7 +133,7 @@ export default defineComponent({
           player.on('loadedmetadata', () => {
             if(this.thumbnail_data.url){
               // 初始化视频缩略图插件
-              const computed_interval = player.duration() / 200;  
+              const computed_interval = player.duration() / 200;
               new spriteThumbnails(player, {
                 url: this.thumbnail_data.url,
                 width: 200,
@@ -229,16 +150,6 @@ export default defineComponent({
             player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
 
             player.on('timeupdate', () => {
-              //pc mobile
-              if (!player.el().classList.contains('vjs-device-ipad') && !player.el().classList.contains('vjs-has-started')) {
-                this.tryPlay(player)
-              }
-
-              //ipad
-              if (player.el().classList.contains('vjs-device-ipad') && !player.el().classList.contains('vjs-has-started')) {
-                player.el().classList.add('vjs-has-started');
-              }
-
               localStorage.setItem(`video-${this.id}-currentTime`, player.currentTime());
             });
 
@@ -307,6 +218,7 @@ export default defineComponent({
     display: flex;
     justify-content: center;
     align-items: center;
+    background-color: rgba(0,0,0,0.9);
 
     &:before {
       content: "";
@@ -336,7 +248,7 @@ export default defineComponent({
         width: 100%;
         height: calc(100% - 4.4em);
         transform: translate(0, 0) scale(1);
-       }       
+       }
       }
 
       &.vjs-device-ipad,
@@ -353,7 +265,7 @@ export default defineComponent({
       }
 
       //切换画质
-      &.user-pause {
+      .vjs-waiting {
         .vjs-big-play-button,
         .vjs-duration {
           display: none;
@@ -363,7 +275,7 @@ export default defineComponent({
           display: block;
         }
       }
-      
+
     }
 
     .video-js:hover {
@@ -490,7 +402,7 @@ export default defineComponent({
     //音量
     .vjs-volume-panel.vjs-control.vjs-volume-panel-vertical {
       &.vjs-hover {
-        .vjs-volume-control.vjs-volume-vertical { 
+        .vjs-volume-control.vjs-volume-vertical {
           left: -4em;
         }
       }
@@ -608,6 +520,18 @@ export default defineComponent({
       height: 5em;
       transform: translate(-50%, -50%) scale(0.8);
     }
+
+    .vjs-touch-enabled.vjs-waiting .vjs-custom-play-pause-button,
+    .vjs-waiting .vjs-custom-play-pause-button,
+    .vjs-custom-play-pause-button {
+      display: none;
+    }
+
+    .vjs-touch-enabled {
+      .vjs-custom-play-pause-button {
+        display: inline-block;
+      }
+    }
   }
 
   @media (max-width: 768px) {
@@ -637,7 +561,6 @@ export default defineComponent({
 
       .vjs-has-started {
         .custom-play-pause-btn{
-          display: block;
           opacity: 1;
           position: absolute;
           top: 50%;
@@ -669,7 +592,7 @@ export default defineComponent({
           top: 50%;
           left: 50%;
           height: auto;
-          transform: translate(-50%, -50%); 
+          transform: translate(-50%, -50%);
         }
 
       }
@@ -688,7 +611,6 @@ export default defineComponent({
         }
       }
     }
-  
   }
  @media screen and (max-width: 1248px) {
     .video-player-wrap {
