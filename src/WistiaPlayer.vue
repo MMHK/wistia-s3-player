@@ -166,7 +166,7 @@ export default defineComponent({
             player.on('seeked', () => {
               //初始化视频还未播放时，改变播放进度(非切换画质引起的)，PC mobile 表现为立即播放，ipad为暂停，均显示当前播放时间
               const isIpadDevice = player.el().classList.contains('vjs-device-ipad');
-              const init =!player.el().classList.contains('vjs-has-started');
+              const init =!player.hasStarted();
               const qualityChangeSeeked = localStorage.getItem(`video-${this.id}-qualityChange`) == 'true';
               //PC mobile 
               if (init && !isIpadDevice && !qualityChangeSeeked) {
