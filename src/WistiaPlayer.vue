@@ -123,7 +123,8 @@ export default defineComponent({
             }
           }
 
-          player.on('error', function() {
+          player.on('error', function(err) {
+            console.log(err)
             var errorDisplayElem = document.querySelector('.vjs-error-display .vjs-modal-dialog-content');
             if (errorDisplayElem) {
                 errorDisplayElem.innerText = "Media not found.";
@@ -174,6 +175,11 @@ export default defineComponent({
               }
               //ipad
               if (init && isIpadDevice) {
+                player.el().classList.add('vjs-has-started');
+              }
+
+              //修正： 暂停的时候切换画质，视频封面出现了
+              if(player.currentTime()) {
                 player.el().classList.add('vjs-has-started');
               }
             });
@@ -255,6 +261,12 @@ export default defineComponent({
 
     .video-js {
       background-color: transparent;
+
+      &.vjs-paused .vjs-has-started{
+        .vjs-poster {
+          display: none;
+        }
+      }
 
       &.vjs-device-ipad {
        .vjs-control-bar {
