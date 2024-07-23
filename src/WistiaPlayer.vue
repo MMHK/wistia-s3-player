@@ -146,7 +146,7 @@ export default defineComponent({
           });
 
           player.ready(() => {
-
+            localStorage.removeItem(`video-${this.id}-qualityChange`);
             player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
 
             player.on('timeupdate', () => {
@@ -158,6 +158,26 @@ export default defineComponent({
               player.removeClass('video-reload');
             });
 
+
+            player.on('qualitySelected', () => {
+              localStorage.setItem(`video-${this.id}-qualityChange`, true);
+            });
+
+            player.on('seeked', () => {
+              //初始化视频还未播放时，改变播放进度(非切换画质引起的)，PC mobile 表现为立即播放，ipad为暂停，均显示当前播放时间
+              const isIpadDevice = player.el().classList.contains('vjs-device-ipad');
+              const init =!player.el().classList.contains('vjs-has-started');
+              const qualityChangeSeeked = localStorage.getItem(`video-${this.id}-qualityChange`) == 'true';
+              //PC mobile 
+              if (init && !isIpadDevice && !qualityChangeSeeked) {
+                this.tryPlay(player); 
+              }
+              //ipad
+              if (init && isIpadDevice) {
+                player.el().classList.add('vjs-has-started');
+              }
+            });
+            
           });
         })
       })
