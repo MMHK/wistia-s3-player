@@ -298,12 +298,6 @@ export default defineComponent({
 
     }
 
-    .video-js:hover {
-      .vjs-big-play-button {
-        background-color: rgba(84, 187, 255, 0.7);
-      }
-    }
-
 	.video-js .vjs-tech:focus {
       outline: none;
     }
@@ -321,9 +315,9 @@ export default defineComponent({
       border: none;
       margin: 0;
       transform: translate(-50%, -50%);
-      background-color: rgba(84, 187, 255, 0.7);
+      background-color: rgb(84, 187, 255);
       &:hover{
-        background-color: rgba(161, 217, 255, 0.7);
+        background-color: #8ad0ff; 
       }
 
       .vjs-icon-placeholder {
