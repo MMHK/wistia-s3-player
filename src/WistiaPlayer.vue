@@ -175,12 +175,12 @@ export default defineComponent({
               }
               //ipad
               if (init && isIpadDevice) {
-                player.el().classList.add('vjs-has-started');
+                player.hasStarted(true);
               }
 
               //修正： 暂停的时候切换画质，视频封面出现了
               if(player.currentTime()) {
-                player.el().classList.add('vjs-has-started');
+                player.hasStarted(true);
               }
             });
             
