@@ -303,7 +303,8 @@ export default defineComponent({
       }
 
       &.vjs-device-ipad,
-      &.vjs-device-iphone{
+      &.vjs-device-iphone,
+      &.vjs-device-android{
         .vjs-volume-panel {
           display: none;
         }
