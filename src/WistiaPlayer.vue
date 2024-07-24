@@ -161,6 +161,7 @@ export default defineComponent({
 
 
             player.on('qualitySelected', () => {
+              player.addClass('vjs-waiting');
               localStorage.setItem(`video-${this.id}-qualityChange`, true);
             });
 
@@ -262,9 +263,27 @@ export default defineComponent({
     .video-js {
       background-color: transparent;
 
-      &.vjs-paused .vjs-has-started{
+      &.vjs-paused.vjs-has-started,
+      &.vjs-seeking,
+      &.vjs-waiting,
+      &.vjs-quality-changing {
         .vjs-poster {
           display: none;
+        }
+        .vjs-big-play-button {
+          display: none;
+        }
+
+        .vjs-custom-play-pause-button {
+          display: none;
+        }
+
+        .vjs-duration {
+          display: none;
+        }
+
+        .vjs-current-time {
+          display: block;
         }
       }
 
