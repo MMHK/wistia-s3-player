@@ -113,16 +113,6 @@ export default defineComponent({
             this.watcher.start();
           });
 
-          // 恢复播放时间
-          const savedTime = localStorage.getItem(`video-${this.id}-currentTime`);
-          if (savedTime) {
-            const formatTime = parseFloat(savedTime)
-            if(formatTime > 10) {
-              player.currentTime(formatTime);
-              player.addClass('video-reload');
-            }
-          }
-
           player.on('error', function(err) {
             console.log(err)
             var errorDisplayElem = document.querySelector('.vjs-error-display .vjs-modal-dialog-content');
@@ -149,15 +139,6 @@ export default defineComponent({
           player.ready(() => {
             localStorage.removeItem(`video-${this.id}-qualityChange`);
             player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
-
-            player.on('timeupdate', () => {
-              localStorage.setItem(`video-${this.id}-currentTime`, player.currentTime());
-            });
-
-            player.on('ended', () => {
-              localStorage.removeItem(`video-${this.id}-currentTime`);
-              player.removeClass('video-reload');
-            });
 
 
             player.on('qualitySelected', () => {
@@ -392,8 +373,7 @@ export default defineComponent({
       display: block;
     }
 
-    .vjs-has-started.video-js,
-    .video-reload.video-js {
+    .vjs-has-started.video-js {
 
       .vjs-duration {
         display: none;
