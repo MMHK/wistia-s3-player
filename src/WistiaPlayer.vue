@@ -263,7 +263,7 @@ export default defineComponent({
     .video-js {
       background-color: transparent;
 
-      &.vjs-paused .vjs-has-started,
+      &.vjs-paused.vjs-has-started,
       &.vjs-seeking,
       &.vjs-waiting,
       &.vjs-quality-changing {
