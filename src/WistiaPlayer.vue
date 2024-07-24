@@ -274,16 +274,20 @@ export default defineComponent({
           display: none;
         }
 
-        .vjs-custom-play-pause-button {
-          display: none;
-        }
-
         .vjs-duration {
           display: none;
         }
 
         .vjs-current-time {
           display: block;
+        }
+      }
+
+      &.vjs-seeking,
+      &.vjs-waiting,
+      &.vjs-quality-changing {
+        .vjs-custom-play-pause-button {
+          display: none;
         }
       }
 
