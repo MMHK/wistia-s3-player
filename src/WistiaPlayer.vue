@@ -20,6 +20,9 @@ qualitySelector(videojs);
 videojs.registerPlugin('spriteThumbnails', spriteThumbnails);
 
 const Button = videojs.getComponent('Button');
+const PlaybackRateMenuButton = videojs.getComponent('PlaybackRateMenuButton');
+const MenuButton = videojs.getComponent('MenuButton');
+const PlaybackRateMenuItem = videojs.getComponent('PlaybackRateMenuItem');
 
 class CustomPlayPauseButton extends Button {
   constructor(player, options) {
@@ -43,8 +46,57 @@ class CustomPlayPauseButton extends Button {
   }
 }
 
-
 videojs.registerComponent('CustomPlayPauseButton', CustomPlayPauseButton);
+
+
+// 创建一个自定义的 PlaybackRateMenuButton
+class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
+  constructor(player, options) {
+    super(player, options);
+
+    this.updateButtonText()
+    this.player().on('ratechange', this.updateButtonText.bind(this));
+  }
+
+  createEl() {
+    return MenuButton.prototype.createEl.call(this);
+  }
+
+  createItems() {
+    const rates = this.playbackRates();
+    const items = [];
+
+    for (let i = rates.length - 1; i >= 0; i--) {
+      items.push(new PlaybackRateMenuItem(this.player(), {rate: rates[i] + 'x'}));
+    }
+
+    return items;
+  }
+
+  updateButtonText() {
+    const playbackRate = this.player().playbackRate();
+    const placeholder = this.el().querySelector('.vjs-icon-placeholder');
+    if (placeholder) {
+      placeholder.innerText = `${playbackRate}x`;
+      if (!placeholder.className.includes("vjs-playback-rate-value")) {
+        placeholder.className = `${placeholder.className} vjs-playback-rate-value`
+      }
+    }
+  }
+
+  playbackRates() {
+    const player = this.player();
+
+    return (player.playbackRates && player.playbackRates()) || [];
+  }
+
+  updateLabel() {
+
+  }
+}
+
+videojs.registerComponent('CustomPlaybackRateMenuButton', CustomPlaybackRateMenuButton);
+
 
 export default defineComponent({
   name: "WistiaPlayer",
@@ -76,7 +128,7 @@ export default defineComponent({
               vertical: true
             },
             'qualitySelector',
-            'PlaybackRateMenuButton',
+            'CustomPlaybackRateMenuButton',
             'fullscreenToggle',
           ],
         },
@@ -151,9 +203,9 @@ export default defineComponent({
               const isIpadDevice = player.el().classList.contains('vjs-device-ipad');
               const init =!player.hasStarted();
               const qualityChangeSeeked = localStorage.getItem(`video-${this.id}-qualityChange`) == 'true';
-              //PC mobile 
+              //PC mobile
               if (init && !isIpadDevice && !qualityChangeSeeked) {
-                this.tryPlay(player); 
+                this.tryPlay(player);
               }
               //ipad
               if (init && isIpadDevice) {
@@ -165,7 +217,7 @@ export default defineComponent({
                 player.hasStarted(true);
               }
             });
-            
+
           });
         })
       })
@@ -334,7 +386,7 @@ export default defineComponent({
       transform: translate(-50%, -50%);
       background-color: rgb(84, 187, 255);
       &:hover{
-        background-color: #8ad0ff; 
+        background-color: #8ad0ff;
       }
 
       .vjs-icon-placeholder {
