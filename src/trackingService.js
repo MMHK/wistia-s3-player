@@ -10,22 +10,61 @@ const storagePull = (key, defaultValue = null) => {
     return null
 }
 
+const gtagInstalled = () => {
+    if (window.gtag instanceof Function) {
+        return true;
+    }
+
+    const loaded = Array.from(window.dataLayer).find((item) => {
+        return item.hasOwnProperty('event') && item.event === 'gtm.load';
+    });
+
+    return !!(loaded);
+}
+
+const installGtag = (TAG_ID) => {
+    const script = document.querySelector('script[src*=gtag]');
+    if (!script) {
+        const script = document.createElement('script');
+        script.src = `//www.googletagmanager.com/gtag/js?id=${TAG_ID}`;
+        script.async = true;
+        document.head.appendChild(script);
+    }
+    window.dataLayer = window.dataLayer || [];
+    if (!window.gtag) {
+        window.gtag = function () {window.dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', TAG_ID);
+    }
+}
+
+const autoConfigGtag = (TAG_ID) => {
+    if (!gtagInstalled()) {
+        installGtag(TAG_ID);
+    }
+}
 
 
 const sendCustomEvent = (eventName, eventParams) => {
     const hasGtag = typeof gtag === 'function';
     const hasDataLayer = typeof dataLayer !== 'undefined' && dataLayer.hasOwnProperty("push");
 
-    console.log(hasGtag, hasDataLayer);
+    const withPagePath = {
+        ...eventParams,
+        page_title: eventParams.page_title || document.title,
+        page_location: eventParams.page_location || location.href,
+    };
+
+    // console.log(hasGtag, hasDataLayer);
 
     if (hasGtag) {
         // 使用 gtag 发送事件
-        gtag('event', eventName, eventParams);
+        gtag('event', eventName, withPagePath);
     } else if (hasDataLayer) {
         // 使用 dataLayer 发送事件
         dataLayer.push({
             'event': eventName,
-            ...eventParams
+            ...withPagePath
         });
     } else {
         console.warn('Neither gtag nor dataLayer is available.');
@@ -135,6 +174,9 @@ const CreateWatcher = (player, hashId, Name) => {
     const dataLayoutHandler = dataLayerHandler(hashId, Name, player);
 
     return {
+        configGtag(TAG_ID) {
+                autoConfigGtag(TAG_ID);
+        },
         onReady() {
             return {
                 bind(eventName, callback) {

@@ -48,7 +48,6 @@ class CustomPlayPauseButton extends Button {
 
 videojs.registerComponent('CustomPlayPauseButton', CustomPlayPauseButton);
 
-
 // 创建一个自定义的 PlaybackRateMenuButton
 class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
   constructor(player, options) {
@@ -152,6 +151,13 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    MeasurementId: {
+      type: String,
+      required: false,
+      default: () => {
+        return null;
+      }
+    }
   },
 
   mounted() {
@@ -160,6 +166,9 @@ export default defineComponent({
         this.$nextTick(() => {
           const player = videojs(this.$refs.player, this.options, () => {
             this.watcher = trackingService(player, this.id, this.videoName);
+            if (this.MeasurementId) {
+              this.watcher.configGtag(this.MeasurementId);
+            }
             const shadowPlayer = this.watcher.onReady();
             window.dispatchEvent(new CustomEvent("video-player-ready", {detail: shadowPlayer}));
             this.watcher.start();
