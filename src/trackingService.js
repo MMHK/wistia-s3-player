@@ -15,11 +15,15 @@ const gtagInstalled = () => {
         return true;
     }
 
-    const loaded = Array.from(window.dataLayer).find((item) => {
-        return item.hasOwnProperty('event') && item.event === 'gtm.load';
-    });
+    if (window.dataLayer) {
+        const loaded = Array.from(window.dataLayer).find((item) => {
+            return item.hasOwnProperty('event') && item.event === 'gtm.load';
+        });
 
-    return !!(loaded);
+        return !!(loaded);
+    }
+
+    return false;
 }
 
 const installGtag = (TAG_ID) => {
