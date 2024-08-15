@@ -47,14 +47,46 @@ class CustomPlayPauseButton extends Button {
 }
 
 videojs.registerComponent('CustomPlayPauseButton', CustomPlayPauseButton);
+var rate_btn_click_count = 0;
+var qlty_btn_click_count = 0;
 
 // 创建一个自定义的 PlaybackRateMenuButton
 class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
   constructor(player, options) {
     super(player, options);
 
-    this.updateButtonText()
+    this.updateButtonText();
     this.player().on('ratechange', this.updateButtonText.bind(this));
+    this.on('click', this.handleClick.bind(this));
+    document.addEventListener('click', this.handleDocumentClick.bind(this));
+    document.addEventListener('touchend', this.handleDocumentClick.bind(this));
+  }
+
+  handleClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    qlty_btn_click_count= 0;
+    rate_btn_click_count += 1;
+
+    if (this.buttonPressed_) {
+      this.unpressButton();
+    } else {
+      this.pressButton();
+    }
+    if (videojs.browser.IS_SAFARI && rate_btn_click_count === 2) {
+      rate_btn_click_count = 0;
+      if (this.menu.hasClass('vjs-lock-showing')) {
+        this.unpressButton();
+      }
+    }
+  }
+
+  handleDocumentClick(event) {
+    const isClickRateMenu = this.el().contains(event.target);
+    if (!isClickRateMenu) {
+      this.unpressButton();
+      rate_btn_click_count = 0;
+    }
   }
 
   createEl() {
@@ -81,21 +113,79 @@ class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
         placeholder.className = `${placeholder.className} vjs-playback-rate-value`
       }
     }
+    rate_btn_click_count = 0;
   }
-
+  
   playbackRates() {
     const player = this.player();
-
     return (player.playbackRates && player.playbackRates()) || [];
   }
 
   updateLabel() {
 
   }
+
+  dispose() {
+    document.removeEventListener('click', this.handleDocumentClick.bind(this));
+    document.removeEventListener('touchend', this.handleDocumentClick.bind(this));
+  }
+  
 }
 
 videojs.registerComponent('CustomPlaybackRateMenuButton', CustomPlaybackRateMenuButton);
 
+
+// 创建一个自定义的 qualitySelectorMenuButton
+const qualitySelectorMenuButton = videojs.getComponent('qualitySelector');
+
+class CustomQualitySelectorMenuButton extends qualitySelectorMenuButton {
+  constructor(player, options) {
+    super(player, options);
+    this.on('click', this.handleClick.bind(this));
+    document.addEventListener('click', this.handleDocumentClick.bind(this));
+    document.addEventListener('touchend', this.handleDocumentClick.bind(this));
+    this.player().on('qualitySelected', this.handleQualityChange.bind(this));
+  }
+
+  handleClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    rate_btn_click_count = 0;
+    qlty_btn_click_count += 1;
+
+    if (this.buttonPressed_) {
+      this.unpressButton();
+    } else {
+      this.pressButton();
+    }
+
+    if (videojs.browser.IS_SAFARI && qlty_btn_click_count === 2) {
+      qlty_btn_click_count = 0;
+      if (this.menu.hasClass('vjs-lock-showing')) {
+        this.unpressButton();
+      }
+    }
+  }
+
+  handleDocumentClick(event) {
+    const isClickQualityMenu = this.el().contains(event.target);
+    if (!isClickQualityMenu) {
+      this.unpressButton();
+      qlty_btn_click_count = 0;
+    }
+  }
+
+  handleQualityChange(event) {
+    qlty_btn_click_count = 0;
+  }
+
+  dispose() {
+    document.removeEventListener('click',  this.handleDocumentClick.bind(this));
+    document.removeEventListener('touchend',  this.handleDocumentClick.bind(this));
+  }
+}
+
+videojs.registerComponent('CustomQualitySelectorMenuButton', CustomQualitySelectorMenuButton);
 
 export default defineComponent({
   name: "WistiaPlayer",
@@ -126,7 +216,7 @@ export default defineComponent({
               inline: false,
               vertical: true
             },
-            'qualitySelector',
+            'CustomQualitySelectorMenuButton',
             'CustomPlaybackRateMenuButton',
             'fullscreenToggle',
           ],
