@@ -55,6 +55,9 @@ class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
 
     this.updateButtonText()
     this.player().on('ratechange', this.updateButtonText.bind(this));
+    this.handleDocumentClick = this.handleDocumentClick.bind(this);
+    document.addEventListener('click', this.handleDocumentClick);
+    document.addEventListener('tap', this.handleDocumentClick);
   }
 
   createEl() {
@@ -92,10 +95,71 @@ class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
   updateLabel() {
 
   }
+
+  handleClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.buttonPressed_) {
+      this.unpressButton();
+      this.blur();
+    } else {
+      this.pressButton();
+      this.focus();
+    }
+    
+    const qualityButton = this.player().getChild('controlBar').getChild('CustomQualitySelectorMenuButton');
+    if (qualityButton && !qualityButton.el().contains(event.target)) {
+      qualityButton.unpressButton();
+    }
+
+  }
+
+  handleDocumentClick(event,res) {
+    if (!this.el().contains(event.target)) {
+      this.unpressButton();
+    }
+
+    const qualityButton = this.player().getChild('controlBar').getChild('CustomQualitySelectorMenuButton');
+    if (qualityButton && !qualityButton.el().contains(event.target)) {
+      qualityButton.unpressButton();
+    }
+  }
+
+  dispose() {
+    document.removeEventListener('click', this.handleDocumentClick);
+    document.removeEventListener('tap', this.handleDocumentClick);
+    super.dispose();
+  }
 }
 
 videojs.registerComponent('CustomPlaybackRateMenuButton', CustomPlaybackRateMenuButton);
 
+// 创建一个自定义的 qualitySelectorMenuButton
+const qualitySelectorMenuButton = videojs.getComponent('qualitySelector');
+class CustomQualitySelectorMenuButton extends qualitySelectorMenuButton {
+  constructor(player, options) {
+    super(player, options);
+  }
+
+  handleClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.buttonPressed_) {
+      this.unpressButton();
+      this.blur();
+    } else {
+      this.pressButton();
+      this.focus();
+    }
+    
+    const playbackRateButton = this.player().getChild('controlBar').getChild('CustomPlaybackRateMenuButton');
+    if (playbackRateButton && !playbackRateButton.el().contains(event.target)) {
+      playbackRateButton.unpressButton();
+    }
+  }
+}
+
+videojs.registerComponent('CustomQualitySelectorMenuButton', CustomQualitySelectorMenuButton);
 
 export default defineComponent({
   name: "WistiaPlayer",
@@ -126,7 +190,7 @@ export default defineComponent({
               inline: false,
               vertical: true
             },
-            'qualitySelector',
+            'CustomQualitySelectorMenuButton',
             'CustomPlaybackRateMenuButton',
             'fullscreenToggle',
           ],
@@ -141,7 +205,7 @@ export default defineComponent({
         playbackRates: [2, 1.75, 1.5, 1.25, 1, 0.75, 0.5],
         userActions: {
           hotkeys: true
-        }
+        },
       };
     },
   },
