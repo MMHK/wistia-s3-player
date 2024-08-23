@@ -47,46 +47,17 @@ class CustomPlayPauseButton extends Button {
 }
 
 videojs.registerComponent('CustomPlayPauseButton', CustomPlayPauseButton);
-var rate_btn_click_count = 0;
-var qlty_btn_click_count = 0;
 
 // 创建一个自定义的 PlaybackRateMenuButton
 class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
   constructor(player, options) {
     super(player, options);
 
-    this.updateButtonText();
+    this.updateButtonText()
     this.player().on('ratechange', this.updateButtonText.bind(this));
-    this.on('click', this.handleClick.bind(this));
-    document.addEventListener('click', this.handleDocumentClick.bind(this));
-    document.addEventListener('touchend', this.handleDocumentClick.bind(this));
-  }
-
-  handleClick(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    qlty_btn_click_count= 0;
-    rate_btn_click_count += 1;
-
-    if (this.buttonPressed_) {
-      this.unpressButton();
-    } else {
-      this.pressButton();
-    }
-    if (videojs.browser.IS_SAFARI && rate_btn_click_count === 2) {
-      rate_btn_click_count = 0;
-      if (this.menu.hasClass('vjs-lock-showing')) {
-        this.unpressButton();
-      }
-    }
-  }
-
-  handleDocumentClick(event) {
-    const isClickRateMenu = this.el().contains(event.target);
-    if (!isClickRateMenu) {
-      this.unpressButton();
-      rate_btn_click_count = 0;
-    }
+    this.handleDocumentClick = this.handleDocumentClick.bind(this);
+    document.addEventListener('click', this.handleDocumentClick);
+    document.addEventListener('tap', this.handleDocumentClick);
   }
 
   createEl() {
@@ -113,11 +84,11 @@ class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
         placeholder.className = `${placeholder.className} vjs-playback-rate-value`
       }
     }
-    rate_btn_click_count = 0;
   }
-  
+
   playbackRates() {
     const player = this.player();
+
     return (player.playbackRates && player.playbackRates()) || [];
   }
 
@@ -125,63 +96,66 @@ class CustomPlaybackRateMenuButton extends PlaybackRateMenuButton {
 
   }
 
-  dispose() {
-    document.removeEventListener('click', this.handleDocumentClick.bind(this));
-    document.removeEventListener('touchend', this.handleDocumentClick.bind(this));
+  handleClick(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.buttonPressed_) {
+      this.unpressButton();
+      this.blur();
+    } else {
+      this.pressButton();
+      this.focus();
+    }
+    
+    const qualityButton = this.player().getChild('controlBar').getChild('CustomQualitySelectorMenuButton');
+    if (qualityButton && !qualityButton.el().contains(event.target)) {
+      qualityButton.unpressButton();
+    }
+
   }
-  
+
+  handleDocumentClick(event,res) {
+    if (!this.el().contains(event.target)) {
+      this.unpressButton();
+    }
+
+    const qualityButton = this.player().getChild('controlBar').getChild('CustomQualitySelectorMenuButton');
+    if (qualityButton && !qualityButton.el().contains(event.target)) {
+      qualityButton.unpressButton();
+    }
+  }
+
+  dispose() {
+    document.removeEventListener('click', this.handleDocumentClick);
+    document.removeEventListener('tap', this.handleDocumentClick);
+    super.dispose();
+  }
 }
 
 videojs.registerComponent('CustomPlaybackRateMenuButton', CustomPlaybackRateMenuButton);
 
-
 // 创建一个自定义的 qualitySelectorMenuButton
 const qualitySelectorMenuButton = videojs.getComponent('qualitySelector');
-
 class CustomQualitySelectorMenuButton extends qualitySelectorMenuButton {
   constructor(player, options) {
     super(player, options);
-    this.on('click', this.handleClick.bind(this));
-    document.addEventListener('click', this.handleDocumentClick.bind(this));
-    document.addEventListener('touchend', this.handleDocumentClick.bind(this));
-    this.player().on('qualitySelected', this.handleQualityChange.bind(this));
   }
 
   handleClick(event) {
     event.preventDefault();
     event.stopPropagation();
-    rate_btn_click_count = 0;
-    qlty_btn_click_count += 1;
-
     if (this.buttonPressed_) {
       this.unpressButton();
+      this.blur();
     } else {
       this.pressButton();
+      this.focus();
     }
-
-    if (videojs.browser.IS_SAFARI && qlty_btn_click_count === 2) {
-      qlty_btn_click_count = 0;
-      if (this.menu.hasClass('vjs-lock-showing')) {
-        this.unpressButton();
-      }
+    
+    const playbackRateButton = this.player().getChild('controlBar').getChild('CustomPlaybackRateMenuButton');
+    if (playbackRateButton && !playbackRateButton.el().contains(event.target)) {
+      playbackRateButton.unpressButton();
     }
-  }
-
-  handleDocumentClick(event) {
-    const isClickQualityMenu = this.el().contains(event.target);
-    if (!isClickQualityMenu) {
-      this.unpressButton();
-      qlty_btn_click_count = 0;
-    }
-  }
-
-  handleQualityChange(event) {
-    qlty_btn_click_count = 0;
-  }
-
-  dispose() {
-    document.removeEventListener('click',  this.handleDocumentClick.bind(this));
-    document.removeEventListener('touchend',  this.handleDocumentClick.bind(this));
   }
 }
 
@@ -231,7 +205,7 @@ export default defineComponent({
         playbackRates: [2, 1.75, 1.5, 1.25, 1, 0.75, 0.5],
         userActions: {
           hotkeys: true
-        }
+        },
       };
     },
   },
