@@ -2,6 +2,22 @@ const BaseURL = window.MEDIA_ENDPOINT || 'https://s3.ap-southeast-1.amazonaws.co
 
 
 export default {
+  fetchMarkers(hashId) {
+      return fetch(`${BaseURL}/${hashId}/markers.json`, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+              'Content-Type': 'application/json'
+          }
+      })
+          .then(response => {
+              if (!response.ok) {
+                  return { markers: [] };
+              }
+              return response.json();
+          })
+          .catch(() => ({ markers: [] }));
+  },
   fetchAssets(hashId) {
       return fetch(`${BaseURL}/${hashId}/index.json`, {
           method: 'GET',

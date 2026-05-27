@@ -15,6 +15,7 @@ import { defineComponent } from 'vue';
 import httpService from "./httpService";
 import trackingService from "./trackingService";
 import spriteThumbnails from 'videojs-sprite-thumbnails';
+import chaptersPlugin from './plugins/videojs-chapters';
 
 qualitySelector(videojs);
 videojs.registerPlugin('spriteThumbnails', spriteThumbnails);
@@ -173,6 +174,7 @@ export default defineComponent({
       hash_id_error: false,
       thumbnail_data: {},
       videoName: "",
+      chapterMarkers: [],
     }
   },
 
@@ -228,15 +230,7 @@ export default defineComponent({
     this.fetchAssets(this.id)
       .then(() => {
         this.$nextTick(() => {
-          const player = videojs(this.$refs.player, this.options, () => {
-            this.watcher = trackingService(player, this.id, this.videoName);
-            if (this.MeasurementId) {
-              this.watcher.configGtag(this.MeasurementId);
-            }
-            const shadowPlayer = this.watcher.onReady();
-            window.dispatchEvent(new CustomEvent("video-player-ready", {detail: shadowPlayer}));
-            this.watcher.start();
-          });
+          const player = videojs(this.$refs.player, this.options);
 
           player.on('error', function(err) {
             console.log(err)
@@ -248,7 +242,6 @@ export default defineComponent({
 
           player.on('loadedmetadata', () => {
             if(this.thumbnail_data.url){
-              // 初始化视频缩略图插件
               const computed_interval = player.duration() / 200;
               new spriteThumbnails(player, {
                 url: this.thumbnail_data.url,
@@ -259,9 +252,24 @@ export default defineComponent({
                 interval: computed_interval,
               });
             }
+
+            httpService.fetchMarkers(this.id).then(data => {
+              if (data.markers && data.markers.length) {
+                this.chapterMarkers = data.markers;
+                player.chapters({ markers: data.markers });
+              }
+            }).catch(() => {});
           });
 
           player.ready(() => {
+            this.watcher = trackingService(player, this.id, this.videoName);
+            if (this.MeasurementId) {
+              this.watcher.configGtag(this.MeasurementId);
+            }
+            const shadowPlayer = this.watcher.onReady();
+            window.dispatchEvent(new CustomEvent("video-player-ready", {detail: shadowPlayer}));
+            this.watcher.start();
+
             localStorage.removeItem(`video-${this.id}-qualityChange`);
             player.addChild('CustomPlayPauseButton', { className: 'custom-play-pause-btn vjs-play-control vjs-control vjs-button'});
 
@@ -272,20 +280,16 @@ export default defineComponent({
             });
 
             player.on('seeked', () => {
-              //初始化视频还未播放时，改变播放进度(非切换画质引起的)，PC mobile 表现为立即播放，ipad为暂停，均显示当前播放时间
               const isIpadDevice = player.el().classList.contains('vjs-device-ipad');
               const init =!player.hasStarted();
               const qualityChangeSeeked = localStorage.getItem(`video-${this.id}-qualityChange`) == 'true';
-              //PC mobile
               if (init && !isIpadDevice && !qualityChangeSeeked) {
                 this.tryPlay(player);
               }
-              //ipad
               if (init && isIpadDevice) {
                 player.hasStarted(true);
               }
 
-              //修正： 暂停的时候切换画质，视频封面出现了
               if(player.currentTime()) {
                 player.hasStarted(true);
               }
@@ -525,6 +529,87 @@ export default defineComponent({
 
     .video-js .vjs-progress-control .vjs-mouse-display {
       background-color: #fff;
+    }
+
+    //章节标记
+    .vjs-progress-holder {
+      .vjs-chapter-marker {
+        position: absolute;
+        top: -2px;
+        bottom: -2px;
+        width: 6px;
+        background-color: rgba(255, 255, 255, 0.95);
+        cursor: pointer;
+        z-index: 3;
+        transition: background-color 0.2s, width 0.2s;
+
+        &:hover {
+          background-color: #fff;
+          width: 8px;
+        }
+
+        &::after {
+          content: attr(data-title);
+          position: absolute;
+          bottom: calc(100% + 10px);
+          left: 50%;
+          transform: translateX(-50%);
+          padding: 8px 14px;
+          background-color: rgba(0, 0, 0, 0.9);
+          color: #fff;
+          font-size: 16px;
+          font-weight: 500;
+          line-height: 1.4;
+          white-space: nowrap;
+          border-radius: 4px;
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.2s;
+          z-index: 10;
+        }
+
+        &::before {
+          content: '';
+          position: absolute;
+          bottom: calc(100% + 6px);
+          left: 50%;
+          transform: translateX(-50%);
+          border: 5px solid transparent;
+          border-top-color: rgba(0, 0, 0, 0.9);
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.2s;
+          z-index: 10;
+        }
+
+        &:hover::after,
+        &:hover::before {
+          opacity: 1;
+        }
+      }
+    }
+
+    //章节导航按钮
+    .vjs-chapters-button {
+      .vjs-menu {
+        .vjs-menu-content {
+          max-height: 300px;
+          overflow-y: auto;
+        }
+
+        .vjs-menu-item {
+          font-size: 1.4em;
+          padding: 0.5em 1em;
+
+          &:hover {
+            background-color: rgba(0, 0, 0, 0.3);
+          }
+
+          &.vjs-selected {
+            background-color: rgba(255, 255, 255, 0.3);
+          }
+        }
+      }
     }
 
     //缩略图样式
