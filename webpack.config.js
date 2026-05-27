@@ -122,7 +122,7 @@ const config = {
 	},
 
 	output: {
-		path: path.resolve(__dirname,  (EXPORT_DEMO ? 'demo' : 'dist')),
+		path: path.resolve(__dirname,  (EXPORT_DEMO ? 'docs' : 'dist')),
 		filename: IN_DEVSERVER ? 'js/[name].js' : 'js/[name].min.js',
 		assetModuleFilename: 'assets/[hash][ext][query]',
 		publicPath: "auto",
