@@ -265,7 +265,7 @@ const config = {
 			},
 			{
 				test: /\.(eot|svg|ttf|woff|woff2)$/i,
-				type: 'asset',
+				type: 'asset/resource',
 				generator: {
 					filename: 'assets/fonts/[hash][ext][query]'
 				},
@@ -286,7 +286,18 @@ const config = {
 				test: /\.css$/,
 				use: [
 					'vue-style-loader',
-					'css-loader'
+					'css-loader',
+					{
+						loader: 'postcss-loader',
+						options: {
+							postcssOptions: {
+								plugins: [
+									["autoprefixer"],
+								],
+							},
+							sourceMap: true,
+						}
+					},
 				]
 			},
 		]
