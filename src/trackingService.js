@@ -183,6 +183,9 @@ const CreateWatcher = (player, hashId, Name) => {
         },
         onReady() {
             return {
+                getHashId() {
+                    return hashId;
+                },
                 bind(eventName, callback) {
                     if (Object.keys(mappings).includes(eventName)) {
                         handler[eventName] = callback;

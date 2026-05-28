@@ -14,7 +14,8 @@
     "serve": "cross-env NODE_ENV=development FRP_ENDPOINT=192.168.33.6 FRP_PUBLIC_DOMAIN=dev.mixmedia.com webpack-dev-server",
     "demo": "cross-env NODE_ENV=production EXPORT_DEMO=true webpack --mode=production --progress",
     "docs": "cross-env NODE_ENV=production EXPORT_DEMO=true webpack --mode=production --progress && node -e \"require('fs').writeFileSync('docs/.nojekyll', '')\"",
-    "test": "mocha"
+    "test": "mocha",
+    "release": "npm version patch && yarn build && npm publish --registry=https://registry.npmjs.org/"
   },
   "author": "Mixmedia",
   "license": "Apache-2.0",
