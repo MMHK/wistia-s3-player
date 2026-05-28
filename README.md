@@ -16,49 +16,87 @@ A Video.js-based video player that mimics the [Wistia](https://wistia.com/) play
 - 📦 Drop-in replacement for Wistia embeds
 - 🎞️ Quality selector support
 - 🖼️ Sprite thumbnails
+- 📊 Built-in Google Analytics 4 (gtag) tracking
+- 🎯 Video chapter markers with timeline indicators
+- 🔔 Custom event bindings for playback tracking
 
-## Installation
+## Tracking & Events
 
-```bash
-npm install wistia-s3-player
-# or
-yarn add wistia-s3-player
-```
+The player includes a built-in `trackingService` that automatically tracks video playback events via Google Analytics 4 (gtag.js).
 
-## Usage
+### Tracked Events
 
-### CDN
+| Event Name | Triggered When |
+|---|---|
+| `wistia_play` | Video starts playing |
+| `wistia_seconds_played` | Every 60 seconds of playback |
+| `wistia_25_percent_played` | 25% watched |
+| `wistia_50_percent_played` | 50% watched |
+| `wistia_75_percent_played` | 75% watched |
+| `wistia_95_percent_played` | 95% watched |
 
-```html
-<script src="https://unpkg.com/wistia-s3-player/dist/js/wistia-s3-player.min.js"></script>
-<script>
-  // Auto-initialize all .wistia_embed elements
-  WistiaS3Player.init();
+### Custom Event Binding
 
-  // Or render a specific video
-  WistiaS3Player.render('videoId');
-</script>
-```
-
-### HTML Embed
-
-```html
-<div class="wistia_embed wistia_async_YOUR_VIDEO_ID"></div>
-```
-
-Then call `init()` to auto-mount all embeds.
-
-### Module
+Listen to the `video-player-ready` event to bind custom callbacks:
 
 ```javascript
-import WistiaS3Player from 'wistia-s3-player';
+window.addEventListener("video-player-ready", (e) => {
+  const watcher = e.detail;
+  const hashId = watcher.getHashId();
 
-// Auto-initialize all .wistia_embed elements
-WistiaS3Player.init();
+  watcher.bind('play', () => {
+    console.log('Video played:', hashId);
+  });
 
-// Or render a specific video
-import { render } from 'wistia-s3-player';
-render('YOUR_VIDEO_ID');
+  watcher.bind('end', () => {
+    console.log('Video ended:', hashId);
+  });
+
+  watcher.bind('percentwatchedchanged', (percent, lastPercent) => {
+    console.log(`Progress: ${percent}%`);
+  });
+});
+```
+
+### Configure GA4 Measurement ID
+
+Pass the `MeasurementId` prop when embedding:
+
+```html
+<div class="wistia_embed wistia_async_YOUR_VIDEO_ID" data-measurement-id="G-XXXXXXX"></div>
+```
+
+## Chapter Markers
+
+The player automatically fetches and renders chapter markers from `markers.json` stored alongside the video assets on S3.
+
+### Markers Format
+
+Place a `markers.json` file in the same directory as your video assets:
+
+```json
+{
+  "markers": [
+    { "time": 0, "title": "Introduction" },
+    { "time": 30, "title": "Getting Started" },
+    { "time": 120, "title": "Advanced Features" }
+  ]
+}
+```
+
+### Features
+
+- Visual markers on the progress bar with hover tooltips
+- Click any marker to seek to that timestamp
+- Chapters menu button in the control bar for navigation
+- Auto-fetched on video load from `{baseURL}/{hashId}/markers.json`
+
+### Custom Endpoint
+
+Override the default S3 endpoint:
+
+```javascript
+window.MEDIA_ENDPOINT = 'https://your-cdn.com/wistia-backup/media';
 ```
 
 ## Development
@@ -75,6 +113,9 @@ yarn build
 
 # Build demo
 yarn demo
+
+# Release to npm (auto-version + build + publish)
+yarn release
 ```
 
 ## Project Structure
