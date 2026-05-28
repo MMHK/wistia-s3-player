@@ -44,8 +44,8 @@ webpack.config.js
 babel.config.*
 
 # Documentation
-README.md
-LICENSE
+!README.md
+!LICENSE
 CHANGELOG.md
 *.md
 !package.json
