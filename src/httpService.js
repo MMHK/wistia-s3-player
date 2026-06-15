@@ -2,8 +2,8 @@ const BaseURL = window.MEDIA_ENDPOINT || 'https://s3.ap-southeast-1.amazonaws.co
 
 
 export default {
-  fetchMarkers(hashId) {
-      return fetch(`${BaseURL}/${hashId}/markers.json`, {
+  fetchIndexAI(hashId) {
+      return fetch(`${BaseURL}/${hashId}/index-ai.json`, {
           method: 'GET',
           mode: 'cors',
           headers: {
@@ -12,11 +12,14 @@ export default {
       })
           .then(response => {
               if (!response.ok) {
-                  return { markers: [] };
+                  return null;
               }
               return response.json();
           })
-          .catch(() => ({ markers: [] }));
+          .catch(() => null);
+  },
+  getSubtitlesUrl(hashId) {
+      return `${BaseURL}/${hashId}/subtitles.vtt`;
   },
   fetchAssets(hashId) {
       return fetch(`${BaseURL}/${hashId}/index.json`, {

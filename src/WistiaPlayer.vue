@@ -253,10 +253,22 @@ export default defineComponent({
               });
             }
 
-            httpService.fetchMarkers(this.id).then(data => {
-              if (data.markers && data.markers.length) {
-                this.chapterMarkers = data.markers;
-                player.chapters({ markers: data.markers });
+            httpService.fetchIndexAI(this.id).then(indexAI => {
+              if (indexAI) {
+                const chapters = indexAI.chapters;
+                if (chapters && chapters.length) {
+                  const markers = chapters.map(ch => ({time: ch.start, title: ch.title}));
+                  this.chapterMarkers = markers;
+                  player.chapters({ markers });
+                }
+
+                player.addRemoteTextTrack({
+                  kind: 'subtitles',
+                  src: httpService.getSubtitlesUrl(this.id),
+                  srclang: indexAI.language || 'en',
+                  label: indexAI.languageLabel || 'English',
+                  default: false,
+                }, false);
               }
             }).catch(() => {});
           });
