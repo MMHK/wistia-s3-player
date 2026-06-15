@@ -162,6 +162,64 @@ class CustomQualitySelectorMenuButton extends qualitySelectorMenuButton {
 
 videojs.registerComponent('CustomQualitySelectorMenuButton', CustomQualitySelectorMenuButton);
 
+class CustomSubtitlesButton extends MenuButton {
+  constructor(player, options) {
+    super(player, options);
+    this._subtitleEnabled = false;
+    this.hide();
+    this.updateButtonText();
+  }
+
+  buildCSSClass() {
+    return `vjs-subtitles-button ${super.buildCSSClass()}`;
+  }
+
+  updateButtonText() {
+    const placeholder = this.el().querySelector('.vjs-icon-placeholder');
+    if (placeholder) {
+      placeholder.innerText = 'CC';
+      if (!placeholder.className.includes('vjs-subtitles-text')) {
+        placeholder.className += ' vjs-subtitles-text';
+      }
+    }
+  }
+
+  createItems() {
+    const MenuItem = videojs.getComponent('MenuItem');
+    const offItem = new MenuItem(this.player(), {
+      label: 'Subtitles Off',
+      selectable: true,
+      selected: !this._subtitleEnabled,
+    });
+    offItem.on('click', () => {
+      this.setSubtitleMode(false);
+    });
+
+    const onItem = new MenuItem(this.player(), {
+      label: 'Subtitles On',
+      selectable: true,
+      selected: this._subtitleEnabled,
+    });
+    onItem.on('click', () => {
+      this.setSubtitleMode(true);
+    });
+
+    return [offItem, onItem];
+  }
+
+  setSubtitleMode(enable) {
+    this._subtitleEnabled = enable;
+    const tracks = this.player().textTracks();
+    for (let i = 0; i < tracks.length; i++) {
+      if (tracks[i].kind === 'subtitles') {
+        tracks[i].mode = enable ? 'showing' : 'disabled';
+      }
+    }
+  }
+}
+
+videojs.registerComponent('CustomSubtitlesButton', CustomSubtitlesButton);
+
 export default defineComponent({
   name: "WistiaPlayer",
 
@@ -194,6 +252,7 @@ export default defineComponent({
             },
             'CustomQualitySelectorMenuButton',
             'CustomPlaybackRateMenuButton',
+            'CustomSubtitlesButton',
             'fullscreenToggle',
           ],
         },
@@ -269,6 +328,9 @@ export default defineComponent({
                   label: indexAI.languageLabel || 'English',
                   default: false,
                 }, false);
+
+                const subtitlesBtn = player.getChild('controlBar').getChild('CustomSubtitlesButton');
+                if (subtitlesBtn) subtitlesBtn.show();
               }
             }).catch(() => {});
           });
@@ -691,6 +753,25 @@ export default defineComponent({
 
     .vjs-quality-selector .vjs-menu .vjs-menu-content {
       left: 0;
+    }
+
+    .vjs-subtitles-button {
+      .vjs-icon-placeholder:before {
+        display: none;
+      }
+
+      .vjs-subtitles-text {
+        font-family: 'Arial Black', 'Helvetica Neue', Arial, sans-serif;
+        font-size: 1.6em;
+        font-weight: 900;
+        line-height: 2.4em;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+    }
+
+    .vjs-text-track-display {
+      opacity: 0.85;
     }
 
     .vjs-playback-rate.vjs-control{
