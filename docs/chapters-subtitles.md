@@ -83,6 +83,14 @@ const track = player.addRemoteTextTrack({
 
 - [x] 4. Build: `yarn build` 確認無錯誤
 
+- [x] 5. 新增 Subtitles Toggle Button (CC)
+  - 新增 `CustomSubtitlesButton` 組件（繼承 `MenuButton`）
+  - 選單包含 "Subtitles Off" 和 "Subtitles On" 選項
+  - 按鈕預設隱藏，載入字幕後自動顯示
+  - 點擊切換字幕 track 的 `mode`（`showing` / `disabled`）
+  - 使用 CC 文字按鈕（Arial Black 字體）
+  - 字幕透明度設為 0.85
+
 ### Phase 2: wistia-s3 (Go web)
 
 - [ ] 5. 更新 `web/package.json` 的 `wistia-s3-player` 版本
@@ -96,7 +104,7 @@ const track = player.addRemoteTextTrack({
 | Project | File | Change |
 |---------|------|--------|
 | wistia-s3-player | `src/httpService.js` | fetchMarkers → fetchIndexAI, 新增 getSubtitlesUrl |
-| wistia-s3-player | `src/WistiaPlayer.vue` | chapters 資料來源改用 index-ai.json, 新增字幕 track |
+| wistia-s3-player | `src/WistiaPlayer.vue` | chapters 資料來源改用 index-ai.json, 新增字幕 track, 新增 CustomSubtitlesButton |
 | wistia-s3-player | `package.json` | version bump |
 | wistia-s3-player | `src/plugins/videojs-chapters.js` | **不變** — 已有完整功能 |
 | wistia-s3 | `web/package.json` | 更新 wistia-s3-player 版本 |
@@ -106,9 +114,10 @@ const track = player.addRemoteTextTrack({
 1. **JS 專案 dev server**: `yarn serve` → 開啟 demo page → 確認：
    - Chapters markers 顯示在 progress bar
    - Chapters button 出現並可選單導航
-   - 字幕選單出現，可切換開/關
+   - CC button 出現（有字幕時）
+   - CC 選單可切換 Subtitles On/Off
    - 沒有 index-ai.json 的影片不報錯（靜默失敗）
-   - 沒有 subtitles.vtt 的影片不報錯
+   - 沒有 subtitles.vtt 的影片 CC button 不顯示
 
 2. **Go web**: `yarn build` → 確認建置無錯誤
 
@@ -116,3 +125,4 @@ const track = player.addRemoteTextTrack({
 
 - [x] srclang/label 從 index-ai.json 動態取得（`language`/`languageLabel` 欄位，fallback `en`/`English`）
 - [x] 字幕預設關閉，用戶手動開啟
+- [x] CC button 使用文字 "CC"（Arial Black 字體）而非 SVG icon

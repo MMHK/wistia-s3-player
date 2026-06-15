@@ -18,6 +18,7 @@ A Video.js-based video player that mimics the [Wistia](https://wistia.com/) play
 - 🖼️ Sprite thumbnails
 - 📊 Built-in Google Analytics 4 (gtag) tracking
 - 🎯 Video chapter markers with timeline indicators
+- 💬 Subtitles toggle button with On/Off control
 - 🔔 Custom event bindings for playback tracking
 
 ## Tracking & Events
@@ -98,6 +99,25 @@ Override the default S3 endpoint:
 ```javascript
 window.MEDIA_ENDPOINT = 'https://your-cdn.com/wistia-backup/media';
 ```
+
+## Subtitles
+
+The player includes a subtitles toggle button (CC) in the control bar.
+
+### Features
+
+- CC button appears only when subtitles are available
+- Toggle subtitles On/Off via menu
+- Subtitles loaded from `{baseURL}/{hashId}/subtitles.vtt`
+- Language info fetched from `index-ai.json` (`language`, `languageLabel` fields)
+- Subtitle track opacity set to 0.85 for better readability
+
+### How It Works
+
+1. Player fetches `index-ai.json` on video load
+2. If `subtitles.vtt` exists, the CC button appears
+3. User can toggle subtitles via the CC menu
+4. If no subtitles available, the button remains hidden
 
 ## Development
 
