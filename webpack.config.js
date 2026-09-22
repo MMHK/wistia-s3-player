@@ -3,69 +3,10 @@ const {globSync} = require("glob");
 const path = require("path");
 const fs = require("fs");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
-const frp = require("mmhk-frp");
-const inquirer = require('inquirer');
-const prompt = inquirer.createPromptModule();
-const http = require('http');
 const fontpath = require('postcss-fontpath');
 
-const FRP_ENDPOINT = process.env.FRP_ENDPOINT || 'localhost';
-const FRP_ENDPOINT_PORT = process.env.FRP_ENDPOINT_PORT || 7000;
-const FRP_API_PORT = process.env.FRP_ENDPOINT_PORT || 7001;
-const FRP_API_USER = process.env.FRP_API_USER || 'admin';
-const FRP_API_PWD = process.env.FRP_API_PWD || 'admin';
-const FRP_PUBLIC_DOMAIN = process.env.FRP_PUBLIC_DOMAIN || 'localhost';
 const IN_DEVSERVER = process.env.WEBPACK_DEV_SERVER || process.env.WEBPACK_SERVE;
 const EXPORT_DEMO = process.env.EXPORT_DEMO;
-
-const checkSubDomainExist = (domain) => {
-	const auth = `${FRP_API_USER}:${FRP_API_PWD}`;
-
-	return new Promise((resolve, reject) => {
-		const req = http.get({
-			hostname: FRP_ENDPOINT,
-			port: FRP_API_PORT,
-			path: '/api/proxy/http',
-			headers: { 'Content-Type': 'application/json' },
-			auth: auth,
-		}, (resp) => {
-			resp.setEncoding('utf8');
-			let data = '';
-
-			// A chunk of data has been received.
-			resp.on('data', (chunk) => {
-				data += chunk;
-			});
-
-			// The whole response has been received. Print out the result.
-			resp.on('end', () => {
-				let json = {};
-				try {
-					json = JSON.parse(data);
-					resolve(json);
-				} catch (err) {
-					reject(err)
-				}
-			});
-
-		});
-		req.on('error', (err) => {
-			console.error(`http error: ${err}`);
-			reject(err);
-		});
-		req.end();
-	})
-		.then((data) => {
-			const list = Array.from(data.proxies || []);
-			if (list.find((row) => {
-				return row.name === domain && row.status === 'online';
-			})) {
-				return Promise.resolve(true);
-			}
-
-			return Promise.resolve(false);
-		})
-}
 
 /*
  * SplitChunksPlugin is enabled by default and replaced
@@ -354,88 +295,4 @@ const config = {
 	stats: IN_DEVSERVER ? "normal" : "errors-warnings",
 };
 
-if (!IN_DEVSERVER) {
-	module.exports = config;
-	return;
-}
-
-module.exports = prompt([
-	{
-		type: 'list',
-		name: 'public',
-		message: '请问是否允外网访问',
-		choices: [
-			{
-				name: "允许",
-				value: true
-			},
-			{
-				name: "不需要",
-				value: false
-			},
-		],
-	},
-	{
-		type: 'input',
-		name: 'subdomain',
-		message: '请配一个霸气的域名',
-		validate: (input) => {
-			return /^([a-z0-9\-]{4,})$/i.test(input);
-		},
-		when: ({public}) => {
-			return public;
-		}
-	},
-]).then(({public, subdomain}) => {
-	return Promise.resolve({
-		...config,
-		devServer: {
-			...config.devServer,
-			client: !public ? {} : {
-				webSocketURL: `https://${subdomain}.${FRP_PUBLIC_DOMAIN}/ws`,
-			},
-			open: !public ? true : {
-				target: `https://${subdomain}.${FRP_PUBLIC_DOMAIN}`,
-			},
-			allowedHosts: [
-				`.${FRP_PUBLIC_DOMAIN}`,
-			],
-			onListening: (devServer) => {
-				if (!devServer) {
-					throw new Error('webpack-dev-server is not defined');
-				}
-				if (!public) {
-					return;
-				}
-				const addr = devServer.server.address();
-
-				console.log('set domain:', subdomain);
-
-				checkSubDomainExist(subdomain)
-					.then((exist) => {
-						if (!exist) {
-							let conf = {
-									common: {
-										serverPort: FRP_ENDPOINT_PORT,
-										serverAddr: FRP_ENDPOINT,
-									},
-								};
-							conf[subdomain] = {
-								type: "http",
-								localIp: "127.0.0.1",
-								localPort: addr.port,
-								subdomain,
-							};
-
-							return frp.startClient(conf);
-						}
-						return Promise.reject(new Error('已经有人使用此霸气的名字'));
-					})
-					.catch((err) => {
-						console.error(err);
-						return Promise.reject(err);
-					})
-			},
-		}
-	})
-})
+module.exports = config;

@@ -10,7 +10,7 @@ Published to npm as `wistia-s3-player`.
 | Command | What it does |
 |---|---|
 | `yarn build` | Production webpack build → `dist/js/wistia-s3-player.min.js` |
-| `yarn serve` | Dev server (Webpack Dev Server). Prompts for FRP tunneling config. |
+| `yarn serve` | Dev server (Webpack Dev Server). |
 | `yarn demo` | Production build to `demo/` for static preview |
 | `yarn test` | Runs `mocha` (no test files exist currently) |
 
@@ -27,8 +27,6 @@ No lint, typecheck, or formatter scripts are configured.
 
 ## Key quirks
 
-- **FRP tunneling**: `yarn serve` uses `mmhk-frp` for external access. Defaults assume a local FRP endpoint. Set `FRP_ENDPOINT` and `FRP_PUBLIC_DOMAIN` env vars to override.
-- **Webpack config is async**: In dev-server mode the config returns a Promise (inquirer prompt). This can break tools that expect synchronous webpack config.
 - **Exports**: `default` = `init()` (auto-mounts all `.wistia_embed` elements). Named export `render(videoId)` mounts a specific player.
 - **TypeScript**: `@babel/preset-typescript` is installed but no `.ts` files exist. `src/index.d.ts` provides type declarations.
 
