@@ -7,6 +7,8 @@ const fontpath = require('postcss-fontpath');
 
 const IN_DEVSERVER = process.env.WEBPACK_DEV_SERVER || process.env.WEBPACK_SERVE;
 const EXPORT_DEMO = process.env.EXPORT_DEMO;
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const IS_PROD = NODE_ENV === 'production';
 
 /*
  * SplitChunksPlugin is enabled by default and replaced
@@ -57,7 +59,7 @@ const getFontmin = () => {
 };
 
 const config = {
-	mode: 'development',
+	mode: NODE_ENV,
 	entry: {
 		"wistia-s3-player": ['./src/main.js'],
 	},
@@ -95,8 +97,8 @@ const config = {
 
 		new webpack.DefinePlugin({
 			__VUE_OPTIONS_API__: 'true',
-			__VUE_PROD_DEVTOOLS__: (IN_DEVSERVER || EXPORT_DEMO) ? 'true' : 'false',
-			__VUE_PROD_HYDRATION_MISMATCH_DETAILS__: IN_DEVSERVER ? 'true' : 'false'
+			__VUE_PROD_DEVTOOLS__: (!IS_PROD) ? 'true' : 'false',
+			__VUE_PROD_HYDRATION_MISMATCH_DETAILS__: (!IS_PROD) ? 'true' : 'false'
 		}),
 
 		new CleanWebpackPlugin(),
@@ -271,10 +273,10 @@ const config = {
 			}),
 		],
 
-		minimize: process.env.NODE_ENV !== 'development',
+		minimize: IS_PROD,
 	},
 
-	devtool: "source-map",
+	devtool: IS_PROD ? 'source-map' : 'eval-cheap-module-source-map',
 	// watch: process.env.NODE_ENV === 'development',
 	watchOptions: {
 		ignored: /(node_modules|webpack)/

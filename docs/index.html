@@ -44,7 +44,7 @@
             .demo-wrap {
                 width: 100%;
             }
-        }</style><script>var MEDIA_ENDPOINT = "https://demo.static.mixmedia.com/wistia-backup/cloudfront/media";</script><script defer="defer" src="js/wistia-s3-player.min.js?3bc6714d19ea2268b3f4"></script></head><body><h3 class="demo-title">WISTIA PLAYER ALTERNATIVE DEMO</h3><div class="demo-wrap"><div class="wistia_responsive_padding"><div class="wistia_responsive_wrapper"><div class="wistia_embed wistia_async_u7k1cgyjy0 videoFoam=true playsinline=true" style="height:100%;width:100%">&nbsp;</div></div></div><div class="console"><pre></pre></div></div><script>(function (){
+        }</style><script defer="defer" src="js/wistia-s3-player.min.js?a4e1b56e4898c6247dbd"></script></head><body><h3 class="demo-title">WISTIA PLAYER ALTERNATIVE DEMO</h3><div class="demo-wrap"><div class="wistia_responsive_padding"><div class="wistia_responsive_wrapper"><div class="wistia_embed wistia_async_u7k1cgyjy0 videoFoam=true playsinline=true" style="height:100%;width:100%">&nbsp;</div></div></div><div class="console"><pre></pre></div></div><script>(function (){
         var queue = [];
         function writeLog(msg) {
             queue.push(msg);
@@ -67,6 +67,25 @@
             var player = e.detail;
             var hashId = player.getHashId();
             writeLog("Player ready: " + hashId);
+
+            // Restore progress
+            var storageKey = "video-progress-" + hashId;
+            var savedTime = localStorage.getItem(storageKey);
+            if (savedTime) {
+                var time = parseFloat(savedTime);
+                player.seek(time);
+                writeLog("Restored progress: " + time.toFixed(1) + "s (" + hashId + ")");
+            }
+
+            // Save progress (every 5 seconds)
+            var lastSavedTime = 0;
+            player.bind("timeupdate", function (currentTime, duration) {
+                if (Math.abs(currentTime - lastSavedTime) >= 5) {
+                    localStorage.setItem(storageKey, currentTime.toString());
+                    lastSavedTime = currentTime;
+                    writeLog("Saved progress: " + currentTime.toFixed(1) + "s (" + hashId + ")");
+                }
+            });
             
             player.bind("play", function () {
                 writeLog("video play (" + hashId + ")");

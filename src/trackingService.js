@@ -172,7 +172,8 @@ const CreateWatcher = (player, hashId, Name) => {
     const mappings = {
         play: "play",
         end: "ended",
-        percentwatchedchanged: "timeupdate"
+        percentwatchedchanged: "timeupdate",
+        timeupdate: "timeupdate"
     };
 
     const dataLayoutHandler = dataLayerHandler(hashId, Name, player);
@@ -190,31 +191,41 @@ const CreateWatcher = (player, hashId, Name) => {
                     if (Object.keys(mappings).includes(eventName)) {
                         handler[eventName] = callback;
                     }
+                },
+                seek(seconds) {
+                    player.currentTime(seconds);
                 }
             }
         },
         start() {
-            let lastPercent = 0;
+            let percentState = { lastPercent: 0 };
             Object.keys(handler).forEach((eventName) => {
                 const realEventName = mappings[eventName];
                 if (realEventName) {
                     if (realEventName === 'timeupdate') {
-                        player.on('timeupdate', (e) => {
-                            const currentTime = player.currentTime();
-                            const duration = player.duration();
-                            let percentWatched = (currentTime / duration) * 100;
+                        // Only attach one listener for timeupdate, even if both
+                        // percentwatchedchanged and timeupdate are bound
+                        if (!percentState.listenerAttached) {
+                            percentState.listenerAttached = true;
+                            player.on('timeupdate', () => {
+                                const currentTime = player.currentTime();
+                                const duration = player.duration();
 
-                            // Round to the nearest whole number
-                            percentWatched = Math.floor(percentWatched);
+                                // Handle percentwatchedchanged
+                                if (handler.percentwatchedchanged) {
+                                    let percentWatched = Math.floor((currentTime / duration) * 100);
+                                    if (percentWatched !== percentState.lastPercent) {
+                                        percentState.lastPercent = percentWatched;
+                                        handler.percentwatchedchanged(percentWatched, percentState.lastPercent);
+                                    }
+                                }
 
-                            // Check if the percent watched has changed
-                            if (percentWatched !== lastPercent) {
-                                lastPercent = percentWatched;
-                                // Trigger a custom event or call a function
-                                handler[eventName](percentWatched, lastPercent);
-                            }
-                        })
-
+                                // Handle timeupdate
+                                if (handler.timeupdate) {
+                                    handler.timeupdate(currentTime, duration);
+                                }
+                            });
+                        }
                         return;
                     }
 

@@ -20,6 +20,7 @@ A Video.js-based video player that mimics the [Wistia](https://wistia.com/) play
 - 🎯 Video chapter markers with timeline indicators
 - 💬 Subtitles toggle button with On/Off control
 - 🔔 Custom event bindings for playback tracking
+- ⏱️ Player control API for programmatic seeking and progress tracking
 
 ## Tracking & Events
 
@@ -58,6 +59,74 @@ window.addEventListener("video-player-ready", (e) => {
   });
 });
 ```
+
+### Available Events
+
+| Event | Callback Parameters | Description |
+|---|---|---|
+| `play` | None | Video starts playing |
+| `end` | None | Video playback ended |
+| `percentwatchedchanged` | `(percent, lastPercent)` | Watched percentage changed (integer 0-100) |
+| `timeupdate` | `(currentTime, duration)` | Current playback time changed (in seconds) |
+
+### Player Control API
+
+The `shadowPlayer` object provides methods to control playback:
+
+```javascript
+window.addEventListener("video-player-ready", (e) => {
+  const player = e.detail;
+  
+  // Get video ID
+  const hashId = player.getHashId();
+  
+  // Seek to specific time (in seconds)
+  player.seek(30.5);
+  
+  // Bind events
+  player.bind('timeupdate', (currentTime, duration) => {
+    console.log(`Current: ${currentTime}s / ${duration}s`);
+  });
+});
+```
+
+#### Methods
+
+| Method | Parameters | Description |
+|---|---|---|
+| `getHashId()` | None | Returns the video hash ID |
+| `bind(eventName, callback)` | `eventName`: Event name, `callback`: Callback function | Binds a callback to a player event |
+| `seek(seconds)` | `seconds`: Time in seconds | Seeks to the specified time |
+
+### Restore Playback Progress
+
+Example: Save and restore playback progress using localStorage:
+
+```javascript
+window.addEventListener("video-player-ready", (e) => {
+  const player = e.detail;
+  const videoId = player.getHashId();
+  const storageKey = `video-progress-${videoId}`;
+  
+  // Restore progress
+  const savedTime = localStorage.getItem(storageKey);
+  if (savedTime) {
+    player.seek(parseFloat(savedTime));
+  }
+  
+  // Save progress (throttled to avoid excessive writes)
+  let lastSavedTime = 0;
+  player.bind('timeupdate', (currentTime) => {
+    // Only save every 5 seconds to avoid excessive localStorage writes
+    if (Math.abs(currentTime - lastSavedTime) >= 5) {
+      localStorage.setItem(storageKey, currentTime.toString());
+      lastSavedTime = currentTime;
+    }
+  });
+});
+```
+
+**Note**: The `timeupdate` event fires frequently. Consider throttling localStorage writes to avoid performance issues.
 
 ### Configure GA4 Measurement ID
 
