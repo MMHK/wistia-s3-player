@@ -93,11 +93,11 @@ const track = player.addRemoteTextTrack({
 
 ### Phase 2: wistia-s3 (Go web)
 
-- [ ] 5. 更新 `web/package.json` 的 `wistia-s3-player` 版本
+- [x] 5. 更新 `web/package.json` 的 `wistia-s3-player` 版本 → `1.2.1`
 
-- [ ] 6. `yarn install` 更新依賴
+- [x] 6. `yarn install` 更新依賴（+ 補回 `css-loader` 為 devDependency）
 
-- [ ] 7. `yarn build` 確認 Go web 建置成功
+- [x] 7. `yarn build` 確認 Go web 建置成功
 
 ## Affected Files
 
